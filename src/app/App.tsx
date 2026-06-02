@@ -95,56 +95,67 @@ export default function App() {
       </nav>
 
       {/* Hero */}
-      <section className="min-h-screen relative flex items-end pt-24">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D]/60 via-transparent to-transparent" />
+      <section>
+        {/* Photo — full bleed, no text on mobile */}
+        <div className="relative w-full" style={{ height: '100svh' }}>
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${heroImage})` }}
+          />
+          {/* Desktop: dark gradient at bottom so text reads */}
+          <div className="absolute inset-0 hidden md:block bg-gradient-to-t from-[#0D0D0D]/70 via-[#0D0D0D]/20 to-transparent" />
+          {/* Mobile: subtle gradient at very bottom leading into the dark text block */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 md:hidden" style={{ background: 'linear-gradient(to bottom, transparent, #0D0D0D)' }} />
 
-        <div className="relative z-10 w-full px-8 md:px-[80px] pb-16 md:pb-24">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="max-w-[700px]">
-              <div
-                className="text-[#EFEFE0] tracking-[3px] mb-6"
-                style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-              >
-                FRIENDS & FAMILY
+          {/* Desktop text — overlaid at bottom */}
+          <div className="hidden md:flex absolute inset-0 items-end px-[80px] pb-24">
+            <div className="max-w-[1440px] mx-auto w-full">
+              <div className="max-w-[700px]">
+                <div className="text-[#EFEFE0] tracking-[3px] mb-6" style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}>
+                  FRIENDS & FAMILY
+                </div>
+                <h1 className="text-[#EFEFE0] leading-[1.2] mb-8" style={{ fontFamily: 'Playfair Display', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 56px)' }}>
+                  Opening Night · Art House · May 22, 2026
+                </h1>
+                <div className="h-[1px] bg-[#EFEFE0] w-[60px] mb-8" />
+                <p className="text-[#EFEFE0] leading-[1.8] mb-12" style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}>
+                  An inaugural gathering of artists, performers and collaborators. The evening opened with SOMA EP.01 — ÆTHER, a live sound and movement performance featuring Masha Zdrok, Julia Skyresident, Hemmer and Franchesca Amore. Works by Antonia Markakis (GR), Alexandra Roca (ES), Evgenia Berestneva (RU), Ewa Zawieja (PL), Miqui (MX) and Severin Hallauer (CH) lined the gallery walls. The night closed with Audaks on the rooftop. Mezcal Amaraz accompanied the experience.
+                </p>
+                <a
+                  href="https://airtable.com/appAotfQn6AhgeUko/pagGD51WT6du5zbSo/form"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block border border-[#EFEFE0] text-[#EFEFE0] px-8 py-[14px] tracking-[3px] hover:bg-[#EFEFE0] hover:text-[#0D0D0D] transition-all duration-200"
+                  style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
+                >
+                  RSVP
+                </a>
               </div>
-
-              <h1
-                className="text-[#EFEFE0] leading-[1.2] mb-8"
-                style={{
-                  fontFamily: 'Playfair Display',
-                  fontWeight: 900,
-                  fontSize: 'clamp(32px, 5vw, 56px)',
-                }}
-              >
-                Opening Night · Art House · May 22, 2026
-              </h1>
-
-              <div className="h-[1px] bg-[#EFEFE0] w-[60px] mb-8" />
-
-              <p
-                className="text-[#EFEFE0] leading-[1.8] mb-12"
-                style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}
-              >
-                An inaugural gathering of artists, performers and collaborators. The evening opened with SOMA EP.01 — ÆTHER, a live sound and movement performance featuring Masha Zdrok, Julia Skyresident, Hemmer and Franchesca Amore. Works by Antonia Markakis (GR), Alexandra Roca (ES), Evgenia Berestneva (RU), Ewa Zawieja (PL), Miqui (MX) and Severin Hallauer (CH) lined the gallery walls. The night closed with Audaks on the rooftop. Mezcal Amaraz accompanied the experience.
-              </p>
-
-              <a
-                href="https://airtable.com/appAotfQn6AhgeUko/pagGD51WT6du5zbSo/form"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block border border-[#EFEFE0] text-[#EFEFE0] px-8 py-[14px] tracking-[3px] hover:bg-[#EFEFE0] hover:text-[#0D0D0D] transition-all duration-200"
-                style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-              >
-                RSVP
-              </a>
             </div>
           </div>
+        </div>
+
+        {/* Mobile text block — dark background, flows naturally from photo */}
+        <div className="md:hidden bg-[#0D0D0D] px-8 pt-10 pb-16">
+          <div className="text-[#EFEFE0] tracking-[3px] mb-5" style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}>
+            FRIENDS & FAMILY
+          </div>
+          <h1 className="text-[#EFEFE0] leading-[1.2] mb-6" style={{ fontFamily: 'Playfair Display', fontWeight: 900, fontSize: 'clamp(28px, 8vw, 42px)' }}>
+            Opening Night · Art House · May 22, 2026
+          </h1>
+          <div className="h-[1px] bg-[#EFEFE0] w-[40px] mb-6" />
+          <p className="text-[#EFEFE0] leading-[1.8] mb-10" style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '13px' }}>
+            An inaugural gathering of artists, performers and collaborators. The evening opened with SOMA EP.01 — ÆTHER, a live sound and movement performance featuring Masha Zdrok, Julia Skyresident, Hemmer and Franchesca Amore. Works by Antonia Markakis (GR), Alexandra Roca (ES), Evgenia Berestneva (RU), Ewa Zawieja (PL), Miqui (MX) and Severin Hallauer (CH) lined the gallery walls. The night closed with Audaks on the rooftop. Mezcal Amaraz accompanied the experience.
+          </p>
+          <a
+            href="https://airtable.com/appAotfQn6AhgeUko/pagGD51WT6du5zbSo/form"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block border border-[#EFEFE0] text-[#EFEFE0] px-8 py-[14px] tracking-[3px]"
+            style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
+          >
+            RSVP
+          </a>
         </div>
       </section>
 
