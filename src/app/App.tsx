@@ -351,74 +351,121 @@ export default function App() {
       </section>
 
       {/* Thursday Dinner Booking */}
-      <section className="fade-section relative min-h-screen flex items-end">
+      <section className="fade-section relative flex flex-col md:flex-row min-h-screen">
+
+        {/* Left — full-bleed photo */}
+        <div className="relative md:w-1/2 min-h-[50vh] md:min-h-screen overflow-hidden">
+          <img
+            src={dinnerImage}
+            alt="Thursday Dinner at POD"
+            className="absolute inset-0 w-full h-full object-cover object-center"
+            style={{ transform: 'scale(1.04)', transition: 'transform 8s ease' }}
+          />
+          {/* Dark gradient from bottom */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0D0D0D 0%, rgba(13,13,13,0.3) 50%, transparent 100%)' }} />
+          {/* Dark gradient from right edge (blends into right panel) */}
+          <div className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(to right, transparent 60%, #0D0D0D 100%)' }} />
+
+          {/* Editorial line over photo */}
+          <div className="absolute bottom-0 left-0 p-10 md:p-14">
+            <div style={{ fontFamily: 'Poppins', fontSize: '9px', fontWeight: 600, letterSpacing: '4px', color: 'rgba(239,239,224,0.5)', marginBottom: '12px' }}>
+              EVERY THURSDAY
+            </div>
+            <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(28px, 4vw, 52px)', color: '#EFEFE0', lineHeight: 1.15 }}>
+              A table where<br />art meets appetite.
+            </div>
+          </div>
+        </div>
+
+        {/* Right — menu & CTA */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${dinnerImage})`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D]/70 via-[#0D0D0D]/40 to-transparent" />
+          className="md:w-1/2 flex flex-col justify-center px-10 md:px-16 py-16 md:py-24"
+          style={{ background: '#0D0D0D' }}
+        >
+          <div className="max-w-[480px]">
 
-        <div className="relative z-10 w-full px-[80px] md:px-[80px] px-5 pb-20 pt-24">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-end">
-              {/* Left side - Info */}
-              <div className="max-w-[600px]">
-                <div
-                  className="text-[#EFEFE0] tracking-[3px] mb-6"
-                  style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-                >
-                  WEEKLY GATHERING
-                </div>
+            {/* Label */}
+            <div style={{ fontFamily: 'Poppins', fontSize: '9px', fontWeight: 600, letterSpacing: '4px', color: 'rgba(239,239,224,0.4)', marginBottom: '20px' }}>
+              WEEKLY GATHERING · CONDESA
+            </div>
 
-                <h1
-                  className="text-[#EFEFE0] leading-[1.2] mb-8"
-                  style={{
-                    fontFamily: 'Playfair Display',
-                    fontWeight: 900,
-                    fontSize: 'clamp(32px, 5vw, 56px)',
-                  }}
-                >
-                  Thursday Dinners
-                </h1>
+            {/* Title */}
+            <h2 style={{ fontFamily: 'Playfair Display', fontWeight: 900, fontSize: 'clamp(36px, 4vw, 60px)', color: '#EFEFE0', lineHeight: 1.05, marginBottom: '8px' }}>
+              Thursday<br />Dinners
+            </h2>
+            <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '13px', color: 'rgba(239,239,224,0.45)', marginBottom: '32px' }}>
+              June 5 · 8:00 PM · Nuevo León 108
+            </div>
 
-                <div className="h-[1px] bg-[#EFEFE0] w-[60px] mb-8" />
+            {/* Divider */}
+            <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(239,239,224,0.2), transparent)', marginBottom: '32px' }} />
 
-                <p
-                  className="text-[#EFEFE0] leading-[1.8]"
-                  style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}
-                >
-                  Join us every Thursday evening for an intimate dinner experience. A carefully curated menu paired with art, conversation, and mezcal. Limited to 20 guests per evening.
-                </p>
+            {/* Description */}
+            <p style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px', lineHeight: 1.9, color: 'rgba(239,239,224,0.65)', marginBottom: '36px' }}>
+              An intimate gathering of 20 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls.
+            </p>
+
+            {/* Menu courses */}
+            <div style={{ marginBottom: '36px' }}>
+              <div style={{ fontFamily: 'Poppins', fontSize: '8px', fontWeight: 600, letterSpacing: '3px', color: 'rgba(239,239,224,0.3)', marginBottom: '16px' }}>
+                THE MENU · · ·
               </div>
-
-              {/* Right side - CTA */}
-              <div className="max-w-[500px] md:ml-auto flex flex-col gap-6">
-                <div>
-                  <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '48px', color: '#EFEFE0', lineHeight: 1 }}>
-                    MX$1,500
-                  </div>
-                  <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '12px', color: 'rgba(239,239,224,0.5)', marginTop: '4px' }}>
-                    per person · 4-course menu with wine pairings
-                  </div>
-                </div>
-                <div style={{ height: '1px', background: 'rgba(239,239,224,0.15)' }} />
-                <div className="space-y-2">
-                  {['Listones del Huerto', 'Cous Cous Cremoso', 'Pesca Levantina', 'Sesame Cheesecake'].map((dish) => (
-                    <div key={dish} style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '14px', color: 'rgba(239,239,224,0.65)' }}>
-                      {dish}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {[
+                  { dish: 'Listones del Huerto', desc: 'Labneh · garbanzo al za\'atar · pepino · vinagreta de hierbas', wine: 'Verdejo · Vinho Verde' },
+                  { dish: 'Cous Cous Cremoso', desc: 'Feta · kalamata · jitomate deshidratado · alcachofa', wine: 'Falanghina · Sauv Blanc de BDX' },
+                  { dish: 'Pesca Levantina', desc: 'Pescado al sumac · tahini tibio · broccolini al harissa', wine: 'Assyrtiko · Riesling Alemán Seco' },
+                  { dish: 'Sesame Cheesecake', desc: 'Crust de ajonjolí · melaza de granada · frutos secos', wine: 'Donnafugata Ben Ryé · Vin Santo' },
+                ].map(({ dish, desc, wine }) => (
+                  <div key={dish} style={{ display: 'flex', gap: '16px', paddingBottom: '18px', borderBottom: '1px solid rgba(239,239,224,0.06)' }}>
+                    <div style={{ width: '4px', minWidth: '4px', height: '4px', borderRadius: '50%', background: 'rgba(239,239,224,0.3)', marginTop: '7px' }} />
+                    <div>
+                      <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '16px', color: '#EFEFE0', lineHeight: 1.2, marginBottom: '4px' }}>
+                        {dish}
+                      </div>
+                      <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '11px', color: 'rgba(239,239,224,0.45)', marginBottom: '4px', lineHeight: 1.5 }}>
+                        {desc}
+                      </div>
+                      <div style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '9px', letterSpacing: '1.5px', color: 'rgba(239,239,224,0.3)' }}>
+                        {wine}
+                      </div>
                     </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setBookingOpen(true)}
-                  className="bg-[#EFEFE0] text-[#0D0D0D] px-8 py-4 tracking-[3px] hover:opacity-90 transition-opacity duration-200 self-start"
-                  style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-                >
-                  RESERVE YOUR TABLE
-                </button>
+                  </div>
+                ))}
               </div>
+            </div>
+
+            {/* Price + scarcity */}
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '28px' }}>
+              <div>
+                <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '42px', color: '#EFEFE0', lineHeight: 1 }}>
+                  MX$1,500
+                </div>
+                <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '11px', color: 'rgba(239,239,224,0.4)', marginTop: '4px' }}>
+                  por persona · maridaje incluido
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px', color: '#EFEFE0' }}>
+                  20 seats
+                </div>
+                <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '10px', color: 'rgba(239,239,224,0.35)', marginTop: '2px' }}>
+                  limited availability
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <button
+              onClick={() => setBookingOpen(true)}
+              className="w-full py-5 tracking-[4px] hover:opacity-90 active:scale-[0.99] transition-all duration-200"
+              style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '11px', background: '#EFEFE0', color: '#0D0D0D', border: 'none', cursor: 'pointer' }}
+            >
+              RESERVE YOUR TABLE
+            </button>
+
+            <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '10px', color: 'rgba(239,239,224,0.25)', textAlign: 'center', marginTop: '14px' }}>
+              Reservación confirmada al pagar · Mezcal Amaraz incluido
             </div>
           </div>
         </div>
