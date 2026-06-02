@@ -3,7 +3,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import DinnerCard from './DinnerCard';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? 'pk_test_placeholder');
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const PRICE_PER_PERSON = 1500;
 
@@ -278,15 +279,34 @@ export default function BookingFlow({ onClose }: BookingFlowProps) {
           )}
 
           {step === 'payment' && formData && (
-            <Elements stripe={stripePromise}>
-              <PaymentForm
-                formData={formData}
-                onSuccess={(id) => {
-                  setReservationId(id);
-                  setStep('card');
-                }}
-              />
-            </Elements>
+            stripePromise ? (
+              <Elements stripe={stripePromise}>
+                <PaymentForm
+                  formData={formData}
+                  onSuccess={(id) => {
+                    setReservationId(id);
+                    setStep('card');
+                  }}
+                />
+              </Elements>
+            ) : (
+              <div className="space-y-6">
+                <div style={{ padding: '20px', border: '1px solid rgba(239,239,224,0.15)', background: 'rgba(239,239,224,0.04)' }}>
+                  <p style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '11px', letterSpacing: '1px', color: 'rgba(239,239,224,0.7)', marginBottom: '8px' }}>
+                    STRIPE NOT CONFIGURED YET
+                  </p>
+                  <p style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '12px', color: 'rgba(239,239,224,0.45)', lineHeight: 1.7 }}>
+                    Add your <code style={{ background: 'rgba(239,239,224,0.1)', padding: '1px 5px' }}>VITE_STRIPE_PUBLISHABLE_KEY</code> and <code style={{ background: 'rgba(239,239,224,0.1)', padding: '1px 5px' }}>STRIPE_SECRET_KEY</code> in Vercel → Settings → Environment Variables to enable payments.
+                  </p>
+                </div>
+                <button
+                  onClick={() => { setReservationId('DEMO-' + Math.random().toString(36).substring(2,7).toUpperCase()); setStep('card'); }}
+                  style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '10px', letterSpacing: '3px', background: 'rgba(239,239,224,0.15)', color: '#EFEFE0', border: '1px solid rgba(239,239,224,0.2)', cursor: 'pointer', width: '100%', padding: '16px' }}
+                >
+                  PREVIEW CONFIRMATION CARD →
+                </button>
+              </div>
+            )
           )}
         </div>
 
