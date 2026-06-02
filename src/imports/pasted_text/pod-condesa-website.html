@@ -1,0 +1,183 @@
+# POD Condesa — Web Build Prompt
+
+You are building the official website for **POD Condesa**, a multidisciplinary space in Mexico City's Condesa neighborhood that fuses an art gallery, creative coworking, café, rooftop, and wellness hub. The site is the digital extension of the brand's soft-opening identity: editorial, sensorial, and unmistakably contemporary.
+
+Build a single-page, scroll-driven website. Use **HTML + CSS + vanilla JS** (or Next.js / Astro / React if explicitly requested). No frameworks beyond what's needed. Production-grade. No placeholder lorem ipsum — use the real copy below.
+
+---
+
+## Brand System (non-negotiable)
+
+### Colors
+```
+--blue:   #1E1EE6   /* Klein blue, primary accent */
+--cream:  #EFEFE0   /* warm off-white, primary background */
+--black:  #0A0A0A   /* near-black, ink */
+--ink:    #111111   /* text default */
+```
+
+Dominant palette is **cream + ink**. Klein blue is used as a sharp accent (waves, handwritten flourishes, hover states, one full-bleed section). Black sections appear at night-themed moments (rooftop / HOG party). Never use gray gradients, never use white pure (#FFF).
+
+### Typography
+- **Display / UI**: `Poppins` — weights 400, 500, 600, 700, 800. Use ExtraBold/800 for headlines with tight tracking (`letter-spacing: -0.02em`).
+- **Handwritten accent**: `Caveat` Bold — only for short emotional phrases ("your new favorite", "friends & family", "see you soon"), always in Klein blue, slight rotation (-3° to +3°).
+- **Mono-style micro-labels**: Poppins SemiBold, uppercase, tracking `0.25em`, size 10–12px. Used for tags like "POD · CONDESA", "NUEVO LEÓN 108", "EST · 2025".
+
+### Visual Motifs
+- **Blue squiggle waves** — the brand's signature. Hand-drawn SVG paths with thick rounded strokes (40–80px), bezier curves, slightly imperfect. They cross sections diagonally, never decorative-only — they bridge content.
+- **Numbered captions** like `(001)`, `(002)`, `(003)` in blue, used as editorial section markers.
+- **Layered grain / noise** subtle overlay on cream backgrounds (`background-blend-mode: multiply` with a low-opacity noise SVG).
+- **Polaroid-style photo treatments** for the gallery section: white border, slight rotation, soft shadow.
+- **Black-and-white film photography** dominates. Color photos only for warm interior shots (golden hour, candlelight).
+
+### Logo
+- **Wordmark**: lowercase `pod` in Poppins ExtraBold, very tight kerning.
+- **Symbol**: 4-pointed star / diamond petal mark (the one from the brand manual). Provide as inline SVG.
+- **Tagline lockup**: `pod` + small caps "PURPOSE DRIVEN HUB" stacked.
+
+---
+
+## Page Structure
+
+### 0. Loader / Intro (2 seconds max)
+Cream background. Center: the `pod` symbol rendered as SVG, blue, scales in from 0 with a slight bounce. The wordmark `pod` types in beneath it. Fade out, then site reveals with a soft stagger.
+
+### 1. Hero
+- **Full viewport height**, cream background.
+- Top-left micro-label: `POD · CONDESA` / Top-right: `EST · 2025 — CDMX`.
+- Center stack:
+  - Huge ExtraBold `pod.` (font-size clamp(120px, 18vw, 280px)), ink color.
+  - Beneath it, in Caveat blue rotated -2°: `a new place for creativity`.
+- A massive Klein blue squiggle wave runs diagonally behind the wordmark (SVG, animated stroke-dashoffset on load, 1.5s ease).
+- Bottom strip with a horizontal scrolling marquee of brand keywords:
+  `art gallery · coworking · coffee · music · rooftop · community · friends · family · creativity ·` (looped)
+- Bottom-right: small "scroll" indicator with a thin vertical line and arrow animation.
+
+### 2. The Brand (manifesto)
+- Two-column editorial layout, asymmetric. Left column 5/12 wide, right 6/12, with a 1-column gap.
+- Section label: `(001) THE BRAND` (blue, tracked).
+- Headline (Poppins ExtraBold, 80–120px): `A space where art, wellness and creativity converge.`
+- Body text (Poppins Regular 18px, max-width 480px):
+  > POD evolves into a multidisciplinary space where contemporary art, wellness, and creativity meet. A gallery, a creative coworking hub, and a wellness meeting point — inside a community in constant motion.
+- Below: 3 looping vertical b&w video tiles (or static images) in a row, slight rotation on hover.
+
+### 3. What You'll Find (services grid)
+- 6 tiles in a 3×2 grid (collapses to 2×3 then 1×6 mobile).
+- Each tile is a cream card with a thin ink border, hover state inverts to Klein blue background with cream text.
+- Tiles:
+  1. **Art Gallery** — `Rotating exhibitions from resident and guest artists.`
+  2. **Coworking** — `A creative workspace for thinkers, makers, and visitors.`
+  3. **Coffee Bar** — `Specialty coffee and slow mornings.`
+  4. **Rooftop** — `Sunset views, music, and gatherings above Condesa.`
+  5. **Wellness** — `Breathwork, sound healing, and somatic experiences.`
+  6. **Events** — `Friends & family openings, talks, and resident artist nights.`
+- Each tile has a small `(00X)` marker in the top corner and a thin handwritten Caveat phrase under the title.
+
+### 4. Resident Artists (this is the hero feature for the May 22 opening)
+- Full-bleed Klein blue section.
+- Big handwritten "meet the" in cream, rotated -3°.
+- Below in cream Poppins ExtraBold 160px: `RESIDENT ARTISTS.`
+- Horizontal scrollable row of 5 artist cards (snap-scroll on mobile):
+  1. Antonia Markakis
+  2. Severin Hallauer
+  3. Eve
+  4. Ewa Zawieja
+  5. Miqui
+- Each card: 3:4 b&w portrait placeholder (use neutral silhouette if no photo), name in Poppins Bold 32px, role beneath in micro-label.
+- Each card opens a modal/drawer with bio and 3 sample works (placeholders fine).
+
+### 5. The Opening — May 22 (event detail)
+- Cream background. Editorial poster layout.
+- Date treatment: enormous "MAY / 22" split typography, with the `/` replaced by a tiny Klein blue squiggle.
+- Two-column program below:
+  - **8 PM — First Floor** · *Art & Wine pre-launch* (handwritten Caveat blue)
+  - **11 PM — Rooftop** · *HOG party* (handwritten Caveat blue)
+- Sticky CTA button: pill-shaped, ink outline, `RSVP →`. Hover fills Klein blue.
+- Small "Friends & Family · By Invitation" tag below.
+
+### 6. The Space (gallery / photostyle)
+- Masonry-style grid, 8–12 images, mixed aspect ratios.
+- Alternate b&w archival shots with one full-bleed Klein blue tile that has only typography on it (e.g., `new place. for everyone.` in handwritten + ExtraBold mix).
+- Lightbox on click — cream background, image centered, micro-caption beneath.
+
+### 7. Find Us
+- Two columns. Left: address block in big Poppins:
+  ```
+  NUEVO LEÓN 108
+  CONDESA
+  CIUDAD DE MÉXICO
+  ```
+  with a Caveat blue handwritten "come find us." underneath, rotated -3°.
+- Right: embedded Mapbox/Google map styled in monochrome cream/ink. Pin is the POD symbol in Klein blue.
+- Below: opening hours table (mono micro-labels for days, Poppins SemiBold for hours).
+
+### 8. Footer
+- Cream background, top edge has the squiggle wave running across (different curve than hero — quieter).
+- Three columns:
+  - Logo + tagline (`PURPOSE DRIVEN HUB`) + a short manifesto sentence.
+  - Quick links: Visit, Artists, Events, Press, Contact.
+  - Newsletter input — minimal: thin underline input, ink placeholder `your email`, blue arrow submit.
+- Bottom row: `© POD CONDESA 2025` left, social handles right (`@podcondesa` Instagram, etc.). All in micro-label style.
+
+---
+
+## Interaction & Motion
+
+- **Scroll-triggered reveals**: each section's headline animates with a mask-reveal (text wipes up from below), staggered 80ms per line. Use IntersectionObserver, not heavy libs.
+- **Cursor**: custom on desktop — a small Klein blue dot that grows into a ring on interactive elements. Hide on touch.
+- **Wave SVGs**: animate `stroke-dashoffset` from full length to 0 when they enter viewport, 1.2s ease-out.
+- **Marquee** in hero: pure CSS `@keyframes` translate, pauses on hover.
+- **Hover on buttons / cards**: 200ms ease, never a jarring snap. Color inversions feel like ink dipping into paper.
+- **No parallax scroll-jacking**. No GSAP unless you can justify it. Minimal, intentional motion.
+
+---
+
+## Responsive Rules
+
+- **Desktop ≥1200px**: full editorial asymmetry, 12-col grid.
+- **Tablet 768–1199px**: collapse asymmetric layouts to 6-col, keep type scale aggressive.
+- **Mobile <768px**: single column, but **keep the brand voice loud** — don't soften display sizes too much. Clamp() on headline sizes. Stories-style snap-scroll for the artist row.
+- Touch targets ≥44px. Cursor effect disabled.
+
+---
+
+## Accessibility & Performance
+
+- Semantic HTML5 (`<header>`, `<main>`, `<section>`, `<nav>`, `<footer>`).
+- All images need alt text.
+- Color contrast: cream/ink passes AAA. Blue/cream passes AA — never put body text on Klein blue, only headlines.
+- Lazy-load images below the fold.
+- Preload Poppins and Caveat from Google Fonts with `font-display: swap`.
+- Target Lighthouse 95+ across the board.
+
+---
+
+## Deliverables
+
+1. `index.html`
+2. `styles.css` (or scoped CSS-in-JS if React)
+3. `script.js` for IntersectionObserver, cursor, marquee, lightbox.
+4. `/assets/` folder structure: `/svg` for waves and logo, `/img` for placeholders.
+5. Inline SVGs for the logo mark and all waves — never raster these.
+
+---
+
+## Anti-Patterns (what NOT to do)
+
+- ❌ No purple-to-blue gradients.
+- ❌ No glassmorphism, no neumorphism, no generic SaaS hero pattern.
+- ❌ No Inter, no Roboto, no Arial as fallback display.
+- ❌ No "Get Started Free" CTA energy. This is a cultural space, not a startup.
+- ❌ No emojis in copy. The handwritten Caveat phrases carry the warmth.
+- ❌ Don't center-align everything. Editorial sites breathe through asymmetry.
+- ❌ No stock photos of generic "diverse team meeting." Use only the moody, candlelit, film-grain aesthetic of the brand manual.
+
+---
+
+## Reference Voice
+
+The site should feel like **Acne Studios meets a Berlin gallery booklet meets a Mexico City wine bar menu**. Quiet luxury, but with a handwritten human edge. Editorial, not corporate. Sensorial, not informational.
+
+Final test: if you can't imagine the site being printed as a zine and handed out at the opening, you've over-designed it.
+
+Build it.
