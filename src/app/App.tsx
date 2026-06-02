@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PodLogo from './components/PodLogo';
+import BookingFlow from './components/BookingFlow';
 import heroImage from '../imports/image.png';
 import dinnerImage from '../imports/IMG_2842.JPG';
 import imgRectangle2 from '../imports/Artboard1-2/ddf546bc1f2cc7ddbc00d75a46dd602ebe310932.png';
@@ -18,29 +19,7 @@ import imgLayer6 from '../imports/Artboard1-2/41171619227ad67c88970294e7d53ac6bb
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [bookingForm, setBookingForm] = useState({
-    name: '',
-    email: '',
-    guests: '2',
-    phone: '',
-  });
-  const [bookingStatus, setBookingStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-
-  const handleBookingSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBookingStatus('submitting');
-
-    // TODO: This will connect to Supabase once configured
-    // For now, just simulate a submission
-    setTimeout(() => {
-      console.log('Booking submitted:', bookingForm);
-      setBookingStatus('success');
-      setTimeout(() => {
-        setBookingStatus('idle');
-        setBookingForm({ name: '', email: '', guests: '2', phone: '' });
-      }, 3000);
-    }, 1000);
-  };
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     const observerOptions = {
@@ -414,119 +393,38 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Right side - Booking Form */}
-              <div className="bg-[#0D0D0D]/60 backdrop-blur-sm border border-[#EFEFE0]/20 p-8 max-w-[500px] md:ml-auto">
-                <h3
-                  className="text-[#EFEFE0] mb-6"
-                  style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '16px', letterSpacing: '2px' }}
+              {/* Right side - CTA */}
+              <div className="max-w-[500px] md:ml-auto flex flex-col gap-6">
+                <div>
+                  <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '48px', color: '#EFEFE0', lineHeight: 1 }}>
+                    MX$1,500
+                  </div>
+                  <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '12px', color: 'rgba(239,239,224,0.5)', marginTop: '4px' }}>
+                    per person · 4-course menu with wine pairings
+                  </div>
+                </div>
+                <div style={{ height: '1px', background: 'rgba(239,239,224,0.15)' }} />
+                <div className="space-y-2">
+                  {['Listones del Huerto', 'Cous Cous Cremoso', 'Pesca Levantina', 'Sesame Cheesecake'].map((dish) => (
+                    <div key={dish} style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '14px', color: 'rgba(239,239,224,0.65)' }}>
+                      {dish}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setBookingOpen(true)}
+                  className="bg-[#EFEFE0] text-[#0D0D0D] px-8 py-4 tracking-[3px] hover:opacity-90 transition-opacity duration-200 self-start"
+                  style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
                 >
                   RESERVE YOUR TABLE
-                </h3>
-
-                {bookingStatus === 'success' ? (
-                  <div className="text-[#EFEFE0] py-8 text-center">
-                    <div className="mb-4 text-2xl">✓</div>
-                    <p style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '14px' }}>
-                      Reservation confirmed! We'll send you details shortly.
-                    </p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleBookingSubmit} className="space-y-4">
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-[#EFEFE0] mb-2"
-                        style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '11px', letterSpacing: '1px' }}
-                      >
-                        NAME
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        required
-                        value={bookingForm.name}
-                        onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })}
-                        className="w-full bg-transparent border border-[#EFEFE0]/30 text-[#EFEFE0] px-4 py-3 focus:outline-none focus:border-[#EFEFE0]"
-                        style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-[#EFEFE0] mb-2"
-                        style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '11px', letterSpacing: '1px' }}
-                      >
-                        EMAIL
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        required
-                        value={bookingForm.email}
-                        onChange={(e) => setBookingForm({ ...bookingForm, email: e.target.value })}
-                        className="w-full bg-transparent border border-[#EFEFE0]/30 text-[#EFEFE0] px-4 py-3 focus:outline-none focus:border-[#EFEFE0]"
-                        style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="block text-[#EFEFE0] mb-2"
-                        style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '11px', letterSpacing: '1px' }}
-                      >
-                        PHONE
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        required
-                        value={bookingForm.phone}
-                        onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })}
-                        className="w-full bg-transparent border border-[#EFEFE0]/30 text-[#EFEFE0] px-4 py-3 focus:outline-none focus:border-[#EFEFE0]"
-                        style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="guests"
-                        className="block text-[#EFEFE0] mb-2"
-                        style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '11px', letterSpacing: '1px' }}
-                      >
-                        NUMBER OF GUESTS
-                      </label>
-                      <select
-                        id="guests"
-                        value={bookingForm.guests}
-                        onChange={(e) => setBookingForm({ ...bookingForm, guests: e.target.value })}
-                        className="w-full bg-[#0D0D0D] border border-[#EFEFE0]/30 text-[#EFEFE0] px-4 py-3 focus:outline-none focus:border-[#EFEFE0]"
-                        style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}
-                      >
-                        {[1, 2, 3, 4, 5, 6].map((num) => (
-                          <option key={num} value={num}>
-                            {num} {num === 1 ? 'Guest' : 'Guests'}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={bookingStatus === 'submitting'}
-                      className="w-full bg-[#EFEFE0] text-[#0D0D0D] px-8 py-4 tracking-[3px] hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
-                      style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-                    >
-                      {bookingStatus === 'submitting' ? 'SUBMITTING...' : 'RESERVE NOW'}
-                    </button>
-                  </form>
-                )}
+                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {bookingOpen && <BookingFlow onClose={() => setBookingOpen(false)} />}
 
       {/* Footer */}
       <footer id="contact" className="bg-[#1A1A1A] py-20 px-[80px] md:px-[80px] px-5">
