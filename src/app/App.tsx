@@ -398,11 +398,25 @@ export default function App() {
             </div>
 
             {/* Divider */}
-            <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(239,239,224,0.2), transparent)', marginBottom: '32px' }} />
+            <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(239,239,224,0.2), transparent)', marginBottom: '28px' }} />
+
+            {/* Chef + Experience tags */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '28px' }}>
+              {[
+                { icon: '◎', label: 'Chef Andrés Kerbel Laiter' },
+                { icon: '♩', label: 'Live performance & DJ' },
+                { icon: '◈', label: 'Mezcal Amaraz' },
+              ].map(({ icon, label }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '6px 12px', border: '1px solid rgba(239,239,224,0.12)', background: 'rgba(239,239,224,0.04)' }}>
+                  <span style={{ fontSize: '10px', color: 'rgba(239,239,224,0.4)' }}>{icon}</span>
+                  <span style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '9px', letterSpacing: '1px', color: 'rgba(239,239,224,0.6)' }}>{label}</span>
+                </div>
+              ))}
+            </div>
 
             {/* Description */}
             <p style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px', lineHeight: 1.9, color: 'rgba(239,239,224,0.65)', marginBottom: '36px' }}>
-              An intimate gathering of 20 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls.
+              An intimate gathering of 20 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls. The night ends with a live performance and DJ set.
             </p>
 
             {/* Menu courses */}
