@@ -416,7 +416,7 @@ export default function App() {
 
             {/* Description */}
             <p style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px', lineHeight: 1.9, color: 'rgba(239,239,224,0.65)', marginBottom: '36px' }}>
-              An intimate gathering of 20 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls. The night ends with a live performance and DJ set.
+              An intimate gathering of 36 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls. The night ends with a live performance and DJ set.
             </p>
 
             {/* Menu courses */}
@@ -461,7 +461,7 @@ export default function App() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px', color: '#EFEFE0' }}>
-                  20 seats
+                  36 seats
                 </div>
                 <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '10px', color: 'rgba(239,239,224,0.35)', marginTop: '2px' }}>
                   limited availability
