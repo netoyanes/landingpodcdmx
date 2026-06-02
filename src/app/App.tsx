@@ -65,7 +65,7 @@ export default function App() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-[1440px] mx-auto px-[80px] py-6 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-8 md:px-[80px] py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <PodLogo color="#EFEFE0" size={32} />
             <div>
@@ -84,57 +84,14 @@ export default function App() {
             </div>
           </div>
 
-          <div className="hidden md:flex gap-8">
-            {['EXHIBITIONS', 'EVENTS', 'SPACE', 'CONTACT'].map((link) => (
-              <a
-                key={link}
-                href={`#${link.toLowerCase()}`}
-                className="text-[#EFEFE0] tracking-[3px] hover:opacity-60 transition-opacity duration-200"
-                style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-              >
-                {link}
-              </a>
-            ))}
-          </div>
-
-          <button
-            className="md:hidden text-[#EFEFE0]"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          <a
+            href="#contact"
+            className="border border-[#EFEFE0] text-[#EFEFE0] px-6 py-3 tracking-[3px] hover:bg-[#EFEFE0] hover:text-[#0D0D0D] transition-all duration-200"
+            style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
+            RSVP
+          </a>
         </div>
-
-        {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 bg-[#0D0D0D] flex flex-col items-center justify-center z-40">
-            <button
-              className="absolute top-6 right-6 text-[#EFEFE0]"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <div className="flex flex-col gap-12 text-center">
-              {['EXHIBITIONS', 'EVENTS', 'SPACE', 'CONTACT'].map((link) => (
-                <a
-                  key={link}
-                  href={`#${link.toLowerCase()}`}
-                  className="text-[#EFEFE0]"
-                  style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontWeight: 400, fontSize: '32px' }}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Hero */}
@@ -147,7 +104,7 @@ export default function App() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D]/60 via-transparent to-transparent" />
 
-        <div className="relative z-10 w-full px-[80px] md:px-[80px] px-5 pb-20">
+        <div className="relative z-10 w-full px-8 md:px-[80px] pb-16 md:pb-24">
           <div className="max-w-[1440px] mx-auto">
             <div className="max-w-[700px]">
               <div
@@ -236,11 +193,11 @@ export default function App() {
         {/* Orange background - bottom 50% */}
         <div className="absolute inset-0 top-[50%] bg-[#A52B0A]">
           {/* Content locked to orange section */}
-          <div className="absolute inset-0 flex flex-col justify-center py-[5%] text-center">
-            <div className="w-full">
+          <div className="absolute inset-0 flex flex-col justify-center py-[8%] text-center">
+            <div className="w-full max-w-[1200px] mx-auto px-8 md:px-[80px]">
               {/* Main Title */}
               <h1
-                className="text-[#c6c2b4] mb-6 max-md:mb-3 px-[3%] md:px-[4%]"
+                className="text-[#c6c2b4] mb-6 max-md:mb-3"
                 style={{
                   fontFamily: 'Mexcellent, Playfair Display',
                   fontWeight: 'normal',
@@ -253,7 +210,7 @@ export default function App() {
               </h1>
 
               {/* Subtitle row */}
-              <div className="flex justify-between items-center mb-8 max-md:flex-col max-md:gap-2 max-md:mb-4 px-[5%] md:px-[8%]">
+              <div className="flex justify-between items-center mb-8 max-md:flex-col max-md:gap-2 max-md:mb-4">
                 <div
                   className="text-[#c6c2b4]"
                   style={{
@@ -282,11 +239,12 @@ export default function App() {
 
               {/* Credits */}
               <div
-                className="text-[#c6c2b4] mb-6 max-md:mb-4 max-w-[900px] mx-auto px-[5%] md:px-[8%]"
+                className="text-[#c6c2b4] mb-6 max-md:mb-4 max-w-[800px] mx-auto"
                 style={{
                   fontFamily: 'Poppins',
-                  fontSize: 'clamp(12px, 1.5vw, 20px)',
-                  lineHeight: '1.4',
+                  fontSize: 'clamp(9px, 0.9vw, 12px)',
+                  lineHeight: '1.6',
+                  opacity: 0.75,
                 }}
               >
                 <span style={{ fontWeight: 600 }}>Curated by:</span>
@@ -298,7 +256,7 @@ export default function App() {
               </div>
 
               {/* Logos row */}
-              <div className="flex justify-center items-center gap-4 md:gap-6 max-md:flex-wrap px-[5%] md:px-[8%]">
+              <div className="flex justify-center items-center gap-4 md:gap-6 max-md:flex-wrap">
                 <img
                   src={imgVectorSmartObject}
                   alt=""
