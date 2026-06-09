@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import PodLogo from './components/PodLogo';
+import { useEffect, useRef, useState } from 'react';
 import BookingFlow from './components/BookingFlow';
 import heroImage from '../imports/image.png';
 import dinnerImage from '../imports/IMG_2842.JPG';
@@ -14,471 +13,582 @@ import imgHog from '../imports/Artboard1-2/d6e757fe4fd9c742a7d50472e5fceefc57b53
 import imgFallenGrape from '../imports/Artboard1-2/91d6cb94d1edb3dd1b6c213301df7cc47113e2b1.png';
 import imgVectorSmartObject from '../imports/Artboard1-2/2eda8c556e6be46840dc1527f7efcb692b409781.png';
 import imgAmaras from '../imports/Artboard1-2/0f7f710cb9205c333e9f7903be68951a76117ce6.png';
-import imgPodArtHouse from '../imports/Artboard1-2/afe3da367efffaf56ea7cb30fc59ede353bd789d.png';
 import imgLayer6 from '../imports/Artboard1-2/41171619227ad67c88970294e7d53ac6bbe4d3fc.png';
 
-export default function App() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
+/* ── design tokens ─────────────────────────────────────── */
+const T = {
+  bg: '#0D0D0D',
+  ink: '#F5F0E8',
+  inkDim: 'rgba(245,240,232,0.58)',
+  inkFaint: 'rgba(245,240,232,0.34)',
+  sand: '#C8B89A',
+  surface: '#1A1A1A',
+  surface2: '#161616',
+  border: 'rgba(200,184,154,0.20)',
+  borderFaint: 'rgba(245,240,232,0.08)',
+  serif: "'Cormorant Garamond', Georgia, serif",
+  sans: "'Inter', -apple-system, sans-serif",
+  mexcellent: "'Mexcellent', 'Cormorant Garamond', serif",
+};
 
-  useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
-    };
+/* ── events data ───────────────────────────────────────── */
+const EVENTS = [
+  { n: 'Thursday Dinner', d: 'JUN 5', day: 'THU', t: '8 PM', type: 'Dinner', dinner: true,
+    desc: 'Chef Andrés Kerbel Laiter · 4-course Levantine menu with wine pairings · Live performance & DJ · 36 seats.' },
+  { n: "Drink & Draw", d: 'JUN 12', day: 'FRI', t: '7 PM', type: 'Workshop',
+    desc: 'Life-drawing session — materials, a glass and a model. No experience required, only attention.' },
+  { n: "Rosas presenta 'Jardín'", d: 'JUN 12', day: 'FRI', t: '9 PM', type: 'Music',
+    desc: 'An intimate live set from Rosas debuting Jardín — botanical soundscapes for the late hours.' },
+  { n: 'Argentina Night', d: 'JUN 16', day: 'TUE', t: '8 PM', type: 'Music',
+    desc: 'Tango, vinyl and Malbec. A Buenos Aires evening in the heart of Condesa.' },
+  { n: 'Colombian Brunch', d: 'JUN 17', day: 'WED', t: '12 PM', type: 'Music',
+    desc: 'Midday cumbia, arepas and slow coffee. A sunlit Colombian table.' },
+  { n: 'PRIDE NIGHT', d: 'JUN 26', day: 'FRI', t: '7 PM', type: 'Community',
+    desc: 'A celebration of queer art, music and community. All welcome, all seen.' },
+  { n: 'French Afternoon', d: 'JUN 26', day: 'FRI', t: 'TBD', type: 'Community',
+    desc: 'Apéritif hour à la française — pétanque, pastis and unhurried conversation.' },
+  { n: 'Vinyl Market', d: 'JUN 27', day: 'SAT', t: '12 PM', type: 'Music',
+    desc: 'Crate-diggers market. Independent sellers, rare pressings and live selectors all day.' },
+];
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('fade-in');
-        }
-      });
-    }, observerOptions);
+/* ── access card data ──────────────────────────────────── */
+interface SavedCard {
+  id: number;
+  folio: string;
+  name: string;
+  email: string;
+  ig: string;
+  eventIdx: number;
+}
 
-    document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el));
+function genFolio() { return '№ ' + String(Math.floor(1000 + Math.random() * 9000)); }
 
-    return () => observer.disconnect();
-  }, []);
+/* ── sub-components ────────────────────────────────────── */
+
+function AccessPass({ card }: { card: SavedCard }) {
+  const ev = EVENTS[card.eventIdx];
+  return (
+    <div style={{
+      width: '312px', background: T.surface, border: `1px solid ${T.border}`,
+      borderRadius: '8px', boxShadow: '0 24px 60px -28px rgba(0,0,0,.9)',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px 13px' }}>
+        <span style={{ fontFamily: T.sans, fontWeight: 600, fontSize: '9.5px', letterSpacing: '.22em', textTransform: 'uppercase', color: T.ink }}>POD ART HOUSE</span>
+        <span style={{ fontFamily: T.sans, fontSize: '10px', letterSpacing: '.1em', color: T.inkFaint }}>{card.folio}</span>
+      </div>
+      <div style={{ height: '80px', borderTop: `1px solid ${T.borderFaint}`, borderBottom: `1px solid ${T.borderFaint}`, background: T.surface2, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '9px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.sand, opacity: .7 }}>{ev.type}</span>
+        <span style={{ position: 'absolute', right: '12px', bottom: '11px', fontFamily: T.sans, fontWeight: 600, fontSize: '8.5px', letterSpacing: '.16em', textTransform: 'uppercase', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '3px', padding: '5px 9px', transform: 'rotate(-6deg)', background: 'rgba(13,13,13,0.5)' }}>Access Confirmed</span>
+      </div>
+      <div style={{ padding: '18px' }}>
+        <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '9px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint }}>{ev.type} · 2026</div>
+        <h4 style={{ fontFamily: T.serif, fontWeight: 500, fontSize: '1.45rem', lineHeight: 1.08, color: T.ink, margin: '9px 0 16px' }}>{ev.n}</h4>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '11px' }}>
+          <span style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 600, fontSize: '10px', letterSpacing: '.1em', textTransform: 'uppercase', color: '#0D0D0D', background: T.sand, padding: '6px 11px', borderRadius: '3px' }}>{ev.day} · {ev.d}</span>
+          <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '12px', color: T.sand }}>{ev.t}</span>
+        </div>
+      </div>
+      <div style={{ position: 'relative', height: 0, borderTop: `1px dashed ${T.border}`, margin: '2px 18px' }}>
+        <div style={{ position: 'absolute', top: '-9px', left: '-27px', width: '18px', height: '18px', borderRadius: '50%', background: T.surface2 }} />
+        <div style={{ position: 'absolute', top: '-9px', right: '-27px', width: '18px', height: '18px', borderRadius: '50%', background: T.surface2 }} />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px', padding: '15px 18px 18px' }}>
+        <div>
+          <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '8.5px', letterSpacing: '.18em', textTransform: 'uppercase', color: T.inkFaint }}>Admit one</div>
+          <div style={{ fontFamily: T.sans, fontWeight: 400, fontSize: '11px', color: T.ink, marginTop: '5px' }}>{card.name}{card.ig ? ` · ${card.ig}` : ''}</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontFamily: T.sans, fontSize: '8.5px', color: T.inkFaint, lineHeight: 1.55 }}>Av. Nuevo León 108<br />Hipódromo Condesa, CDMX</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RSVPSheet({ eventIdx, onClose, onSave }: { eventIdx: number; onClose: () => void; onSave: (card: SavedCard) => void }) {
+  const ev = EVENTS[eventIdx];
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [ig, setIg] = useState('');
+  const [errors, setErrors] = useState({ name: false, email: false });
+  const [card, setCard] = useState<SavedCard | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  const submit = () => {
+    const nameOk = name.trim().length > 0;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    setErrors({ name: !nameOk, email: !emailOk });
+    if (!nameOk || !emailOk) return;
+    setCard({ id: Date.now(), folio: genFolio(), name: name.trim(), email: email.trim(), ig: ig.trim() ? (ig[0] === '@' ? ig.trim() : '@' + ig.trim()) : '', eventIdx });
+  };
+
+  const save = () => {
+    if (!card) return;
+    onSave(card);
+    setSaved(true);
+  };
 
   return (
-    <main className="bg-white min-h-screen">
-      <style>
-        {`
-          @keyframes fadeInUp {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .fade-section {
-            opacity: 0;
-          }
-          .fade-section.fade-in {
-            animation: fadeInUp 600ms ease-out forwards;
-          }
-        `}
-      </style>
+    <div style={{ position: 'relative', width: '100%', maxWidth: card ? '380px' : '460px', maxHeight: '90vh', overflowY: 'auto', background: T.surface2, border: `1px solid ${T.border}`, borderRadius: '6px', padding: '38px 38px 34px', animation: 'sheetin .4s cubic-bezier(.2,.8,.3,1)' }}>
+      <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '18px', width: '34px', height: '34px', borderRadius: '50%', border: `1px solid ${T.borderFaint}`, background: 'transparent', color: T.inkDim, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', cursor: 'pointer' }}>✕</button>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-[80px] py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <PodLogo color="#EFEFE0" size={32} />
+      {!card ? (
+        <>
+          <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>Reserve your spot</span>
+          <h3 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: '2.1rem', lineHeight: 1.05, margin: '8px 0 18px', color: T.ink }}>{ev.n}</h3>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' as const, marginBottom: '28px' }}>
+            {[ev.day + ' · ' + ev.d, ev.t, ev.type].map(p => (
+              <span key={p} style={{ display: 'inline-flex', alignItems: 'center', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.ink, background: 'transparent', border: `1px solid ${T.border}`, borderRadius: '40px', padding: '9px 16px' }}>{p}</span>
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+            {[
+              { label: 'First name', val: name, set: setName, err: errors.name, msg: 'Please add your name.', ph: 'Your name' },
+              { label: 'Email', val: email, set: setEmail, err: errors.email, msg: 'Add a valid email.', ph: 'you@email.com' },
+            ].map(f => (
+              <div key={f.label} style={{ position: 'relative' }}>
+                <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '9px' }}>{f.label}</label>
+                <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph}
+                  style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${f.err ? '#c47a63' : T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
+                {f.err && <div style={{ fontSize: '10px', color: '#c47a63', marginTop: '5px' }}>{f.msg}</div>}
+              </div>
+            ))}
             <div>
-              <div
-                className="text-[#EFEFE0] tracking-[7.5px]"
-                style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-              >
-                POD ART HOUSE
-              </div>
-              <div
-                className="text-[#EFEFE0]/70 tracking-[4px]"
-                style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '9px' }}
-              >
-                NUEVO LEÓN 108 - CDMX
-              </div>
+              <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '9px' }}>Instagram <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
+              <input value={ig} onChange={e => setIg(e.target.value)} placeholder="@handle"
+                style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
             </div>
           </div>
-
-          <a
-            href="#contact"
-            className="border border-[#EFEFE0] text-[#EFEFE0] px-6 py-3 tracking-[3px] hover:bg-[#EFEFE0] hover:text-[#0D0D0D] transition-all duration-200"
-            style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}
-          >
-            RSVP
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, marginTop: '34px' }}>
+            <span style={{ fontFamily: T.sans, fontSize: '11px', letterSpacing: '.1em', textTransform: 'uppercase', color: T.inkFaint }}>Limited capacity · Curated guest list</span>
+            <button onClick={submit} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '14px 26px', borderRadius: '2px', color: '#0D0D0D', background: T.sand, border: `1px solid ${T.sand}`, cursor: 'pointer' }}>
+              Generate access card <span>→</span>
+            </button>
+          </div>
+        </>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.24em', textTransform: 'uppercase', color: T.sand, marginBottom: '22px' }}>Your access card</div>
+          <AccessPass card={card} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '30px', flexWrap: 'wrap' as const, justifyContent: 'center' }}>
+            <button onClick={save} disabled={saved}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '14px 26px', borderRadius: '2px', color: '#0D0D0D', background: saved ? T.inkFaint : T.sand, border: `1px solid ${saved ? T.inkFaint : T.sand}`, cursor: saved ? 'default' : 'pointer', opacity: saved ? .65 : 1 }}>
+              {saved ? '✓ Saved to gallery' : 'Save to my gallery'}
+            </button>
+            <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: T.inkDim, fontFamily: T.sans, fontWeight: 400, fontSize: '11px', letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}>Done</button>
+          </div>
         </div>
-      </nav>
+      )}
+    </div>
+  );
+}
+
+function GallerySheet({ gallery, onClose, onRemove }: { gallery: SavedCard[]; onClose: () => void; onRemove: (id: number) => void }) {
+  return (
+    <div style={{ position: 'relative', width: '100%', maxWidth: '860px', maxHeight: '90vh', overflowY: 'auto', background: T.surface2, border: `1px solid ${T.border}`, borderRadius: '6px', padding: '38px 38px 34px', animation: 'sheetin .4s cubic-bezier(.2,.8,.3,1)' }}>
+      <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '18px', width: '34px', height: '34px', borderRadius: '50%', border: `1px solid ${T.borderFaint}`, background: 'transparent', color: T.inkDim, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', cursor: 'pointer' }}>✕</button>
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '18px', flexWrap: 'wrap' as const, marginBottom: '30px' }}>
+        <div>
+          <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>Curated guest list</span>
+          <h3 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: '2.1rem', lineHeight: 1.05, margin: '6px 0 0', color: T.ink }}>My Gallery</h3>
+        </div>
+        <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint }}>{gallery.length} card{gallery.length !== 1 ? 's' : ''} collected</span>
+      </div>
+      {gallery.length === 0 ? (
+        <div style={{ fontFamily: T.serif, fontWeight: 300, fontSize: '1.5rem', color: T.inkDim, textAlign: 'center', padding: '50px 10px', lineHeight: 1.5 }}>
+          No cards yet.
+          <span style={{ display: 'block', fontFamily: T.sans, fontSize: '12px', color: T.inkFaint, marginTop: '14px' }}>RSVP to any event to collect your first access card.</span>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '26px' }}>
+          {gallery.map(c => (
+            <div key={c.id} style={{ position: 'relative' }}>
+              <button onClick={() => onRemove(c.id)} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 6, width: '26px', height: '26px', borderRadius: '50%', border: `1px solid ${T.borderFaint}`, background: 'rgba(13,13,13,.7)', color: T.inkDim, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
+              <AccessPass card={c} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── main App ──────────────────────────────────────────── */
+export default function App() {
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [rsvpIdx, setRsvpIdx] = useState<number | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [gallery, setGallery] = useState<SavedCard[]>(() => {
+    try { return JSON.parse(localStorage.getItem('pod_gallery') || '[]'); } catch { return []; }
+  });
+  const [topbarSolid, setTopbarSolid] = useState(false);
+  const [stickyShow, setStickyShow] = useState(false);
+  const [toast, setToast] = useState('');
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
+
+  const saveCard = (card: SavedCard) => {
+    setGallery(g => {
+      if (g.some(c => c.id === card.id)) return g;
+      const next = [...g, card];
+      localStorage.setItem('pod_gallery', JSON.stringify(next));
+      return next;
+    });
+    showToast('Saved to My Gallery');
+  };
+
+  const removeCard = (id: number) => {
+    setGallery(g => {
+      const next = g.filter(c => c.id !== id);
+      localStorage.setItem('pod_gallery', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(''), 2200);
+  };
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+    const io = new IntersectionObserver(([e]) => {
+      const gone = !e.isIntersecting;
+      setTopbarSolid(gone);
+      setStickyShow(gone);
+    }, { rootMargin: '-65% 0px 0px 0px' });
+    io.observe(hero);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const els = document.querySelectorAll('.fx');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  const isReserved = (idx: number) => gallery.some(c => c.eventIdx === idx);
+  const overlayOpen = rsvpIdx !== null || galleryOpen;
+
+  return (
+    <div style={{ background: T.bg, color: T.ink, fontFamily: T.sans, fontWeight: 300, lineHeight: 1.6, minHeight: '100vh', overflowX: 'hidden' }}>
+      <style>{`
+        @keyframes sheetin { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+        @keyframes scrollcue { 0%,100%{ transform:scaleX(.3); opacity:.4; } 50%{ transform:scaleX(1); opacity:1; } }
+        @media (prefers-reduced-motion: no-preference) {
+          .fx { opacity:0; transform:translateY(20px); }
+          .fx.in { opacity:1; transform:none; transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.3,1); }
+        }
+        * { box-sizing:border-box; }
+        ::selection { background:${T.sand}; color:#0D0D0D; }
+        input { background:transparent; border:none; border-bottom:1px solid ${T.border}; color:${T.ink}; font-family:${T.sans}; font-size:15px; font-weight:300; padding:8px 0; outline:none; width:100%; }
+        input::placeholder { color:${T.inkFaint}; }
+        input:focus { border-bottom-color:${T.sand}; }
+        .filmstrip { display:flex; gap:clamp(20px,2.4vw,34px); overflow-x:auto; padding-bottom:14px; scroll-snap-type:x mandatory; scrollbar-width:thin; scrollbar-color:${T.border} transparent; }
+        .filmstrip::-webkit-scrollbar { height:5px; }
+        .filmstrip::-webkit-scrollbar-thumb { background:${T.border}; border-radius:40px; }
+      `}</style>
+
+      {/* Film grain */}
+      <div aria-hidden="true" style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', opacity: .05, mixBlendMode: 'overlay',
+        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
+
+      {/* Index rail */}
+      <aside aria-hidden="true" style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: '62px', zIndex: 40, borderRight: `1px solid ${T.borderFaint}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '18px 0', background: 'rgba(13,13,13,0.4)', backdropFilter: 'blur(6px)' }} className="hidden md:flex">
+        <div style={{ fontFamily: T.sans, fontSize: '10px', letterSpacing: '.12em', color: T.inkFaint }}>№ 001</div>
+        <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.34em', textTransform: 'uppercase', color: T.inkDim }}>Hipódromo Condesa · CDMX</div>
+        <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: T.sand }} />
+      </aside>
+
+      {/* Top bar */}
+      <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 45, height: topbarSolid ? '60px' : '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(22px,5vw,72px) 0 calc(62px + clamp(22px,5vw,72px))', transition: 'background .4s ease, height .3s ease', background: topbarSolid ? 'rgba(13,13,13,0.82)' : 'transparent', backdropFilter: topbarSolid ? 'blur(12px)' : 'none', borderBottom: topbarSolid ? `1px solid ${T.borderFaint}` : '1px solid transparent' }}>
+        <div style={{ fontFamily: T.sans, fontWeight: 600, fontSize: '13px', letterSpacing: '.26em', textTransform: 'uppercase', color: T.ink }}>POD Art House</div>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
+          <button onClick={() => setGalleryOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', background: 'transparent', border: 'none', color: T.ink, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            My Gallery
+            <span style={{ minWidth: '20px', height: '20px', padding: '0 6px', borderRadius: '40px', background: gallery.length > 0 ? T.sand : 'transparent', color: gallery.length > 0 ? '#0D0D0D' : T.inkFaint, border: gallery.length > 0 ? 'none' : `1px solid ${T.border}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '10px' }}>
+              {gallery.length}
+            </span>
+          </button>
+          <a href="#contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', textDecoration: 'none' }}>
+            RSVP <span>→</span>
+          </a>
+        </nav>
+      </header>
 
       {/* Hero */}
-      <section>
-        {/* Photo — full bleed, no text on mobile */}
-        <div className="relative w-full" style={{ height: '100svh' }}>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroImage})` }}
-          />
-          {/* Desktop: dark gradient at bottom so text reads */}
-          <div className="absolute inset-0 hidden md:block bg-gradient-to-t from-[#0D0D0D]/70 via-[#0D0D0D]/20 to-transparent" />
-          {/* Mobile: subtle gradient at very bottom leading into the dark text block */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 md:hidden" style={{ background: 'linear-gradient(to bottom, transparent, #0D0D0D)' }} />
-
-          {/* Desktop text — overlaid at bottom */}
-          <div className="hidden md:flex absolute inset-0 items-end px-[80px] pb-24">
-            <div className="max-w-[1440px] mx-auto w-full">
-              <div className="max-w-[700px]">
-                <div className="text-[#EFEFE0] tracking-[3px] mb-6" style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}>
-                  OPENING NIGHT · MAY 22, 2026
-                </div>
-                <h1 className="text-[#EFEFE0] leading-[1.2] mb-8" style={{ fontFamily: 'Playfair Display', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 56px)' }}>
-                  It happened here.
-                </h1>
-                <div className="h-[1px] bg-[#EFEFE0] w-[60px] mb-8" />
-                <p className="text-[#EFEFE0] leading-[1.8] mb-12" style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px' }}>
-                  An inaugural gathering of artists, performers and collaborators. The evening opened with SOMA EP.01 — ÆTHER, a live sound and movement performance featuring Masha Zdrok, Julia Skyresident, Hemmer and Franchesca Amore. Works by Antonia Markakis (GR), Alexandra Roca (ES), Evgenia Berestneva (RU), Ewa Zawieja (PL), Miqui (MX) and Severin Hallauer (CH) lined the gallery walls. The night closed with Audaks on the rooftop. Mezcal Amaraz accompanied the experience.
-                </p>
-              </div>
-            </div>
-          </div>
+      <section ref={heroRef} style={{ position: 'relative', minHeight: '100svh', display: 'flex', alignItems: 'flex-end', padding: '0 clamp(22px,5vw,72px) clamp(56px,8vh,100px) calc(62px + clamp(22px,5vw,72px))', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <img src={heroImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
         </div>
-
-        {/* Mobile text block — dark background, flows naturally from photo */}
-        <div className="md:hidden bg-[#0D0D0D] px-8 pt-10 pb-16">
-          <div className="text-[#EFEFE0] tracking-[3px] mb-5" style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px' }}>
-            OPENING NIGHT · MAY 22, 2026
-          </div>
-          <h1 className="text-[#EFEFE0] leading-[1.2] mb-6" style={{ fontFamily: 'Playfair Display', fontWeight: 900, fontSize: 'clamp(28px, 8vw, 42px)' }}>
-            It happened here.
-          </h1>
-          <div className="h-[1px] bg-[#EFEFE0] w-[40px] mb-6" />
-          <p className="text-[#EFEFE0] leading-[1.8]" style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '13px' }}>
-            An inaugural gathering of artists, performers and collaborators. The evening opened with SOMA EP.01 — ÆTHER, a live sound and movement performance featuring Masha Zdrok, Julia Skyresident, Hemmer and Franchesca Amore. Works by Antonia Markakis (GR), Alexandra Roca (ES), Evgenia Berestneva (RU), Ewa Zawieja (PL), Miqui (MX) and Severin Hallauer (CH) lined the gallery walls. The night closed with Audaks on the rooftop. Mezcal Amaraz accompanied the experience.
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.5) 38%, rgba(13,13,13,0.15) 64%, rgba(13,13,13,0.45) 100%)' }} />
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1040px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div className="fx" style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>Opening Night · May 22, 2026</div>
+          <h1 className="fx" style={{ fontFamily: T.serif, fontWeight: 300, color: T.ink, margin: '.2em 0 0', fontSize: 'clamp(3.1rem,8vw,6rem)', lineHeight: 1.0, letterSpacing: '-.02em' }}>It happened <span style={{ fontStyle: 'italic', fontWeight: 400 }}>here.</span></h1>
+          <p className="fx" style={{ fontFamily: T.serif, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.15rem,2.4vw,1.6rem)', color: T.ink, opacity: .86, maxWidth: '30ch', margin: '.55em 0 2em' }}>An inaugural gathering of artists, performers and collaborators.</p>
+          <p className="fx" style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '13px', lineHeight: 1.8, color: T.inkDim, maxWidth: '52ch' }}>
+            The evening opened with SOMA EP.01 — ÆTHER, a live sound and movement performance. Works by Antonia Markakis, Alexandra Roca, Evgenia Berestneva, Ewa Zawieja, Miqui and Severin Hallauer lined the gallery walls. The night closed with Audaks on the rooftop. Mezcal Amaraz accompanied the experience.
           </p>
         </div>
-      </section>
-
-      {/* Football Exhibition */}
-      <section className="fade-section relative min-h-screen overflow-hidden">
-        {/* Green background - top 50% */}
-        <div className="absolute inset-0 top-0 h-[50%] bg-[#326B3E]">
-          {/* Football diagram composition - locked proportions with air space */}
-          <div className="absolute inset-0 p-[5%] md:p-[8%]">
-            <div className="relative w-full h-full">
-              {/* Based on original aspect ratio, these positions maintain the composition */}
-              <img
-                src={imgRectangle2}
-                alt=""
-                className="absolute left-[1%] top-[8%] w-[48%] h-auto object-contain"
-              />
-              <img
-                src={imgRectangle3}
-                alt=""
-                className="absolute right-[1%] top-[6%] w-[43%] h-auto object-contain"
-              />
-              <img
-                src={imgLayer2}
-                alt=""
-                className="absolute left-[52%] top-[27%] w-[13%] h-auto object-contain"
-              />
-              <img
-                src={imgLayer3}
-                alt=""
-                className="absolute right-[8%] top-[52%] w-[11%] h-auto object-contain"
-              />
-              <img
-                src={imgLayer4}
-                alt=""
-                className="absolute left-[54%] top-[75%] w-[12%] h-auto object-contain"
-              />
-              <img
-                src={imgLayer5}
-                alt=""
-                className="absolute right-[10%] top-[68%] w-[11%] h-auto object-contain"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Orange background - bottom 50% */}
-        <div className="absolute inset-0 top-[50%] bg-[#A52B0A]">
-          {/* Content locked to orange section */}
-          <div className="absolute inset-0 flex flex-col justify-center py-[8%] text-center">
-            <div className="w-full max-w-[1200px] mx-auto px-8 md:px-[80px]">
-              {/* Main Title */}
-              <h1
-                className="text-[#c6c2b4] mb-6 max-md:mb-3"
-                style={{
-                  fontFamily: 'Mexcellent, Playfair Display',
-                  fontWeight: 'normal',
-                  fontSize: 'clamp(48px, 10vw, 140px)',
-                  lineHeight: '1',
-                  letterSpacing: '0.01em',
-                }}
-              >
-                LA PELOTA NO SE MANCHA
-              </h1>
-
-              {/* Subtitle row */}
-              <div className="flex justify-between items-center mb-8 max-md:flex-col max-md:gap-2 max-md:mb-4">
-                <div
-                  className="text-[#c6c2b4]"
-                  style={{
-                    fontFamily: 'Mexcellent, Playfair Display',
-                    fontWeight: 'normal',
-                    fontSize: 'clamp(20px, 3.5vw, 48px)',
-                    lineHeight: '1',
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  ART EXHIBITION
-                </div>
-                <div
-                  className="text-[#c6c2b4]"
-                  style={{
-                    fontFamily: 'Mexcellent, Playfair Display',
-                    fontWeight: 'normal',
-                    fontSize: 'clamp(20px, 3.5vw, 48px)',
-                    lineHeight: '1',
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  5 JUNE - 29 JULY
-                </div>
-              </div>
-
-              {/* Credits */}
-              <div
-                className="text-[#c6c2b4] mb-6 max-md:mb-4 max-w-[800px] mx-auto"
-                style={{
-                  fontFamily: 'Poppins',
-                  fontSize: 'clamp(9px, 0.9vw, 12px)',
-                  lineHeight: '1.6',
-                  opacity: 0.75,
-                }}
-              >
-                <span style={{ fontWeight: 600 }}>Curated by:</span>
-                <span style={{ fontWeight: 400 }}> Ezequiel Suranyi. </span>
-                <span style={{ fontWeight: 600 }}>Artists: </span>
-                <span style={{ fontWeight: 400 }}>
-                  Alistair Woods, Carlos Herrera, Carlos Sarraf, Dani Yako, Eduardo Longoni, Ezequiel Suranyi, Giovanni de Cataldo, Grant Fleming, Hans Van der Meer, Jordi Alós, Jorge Viejo, Jürgen Rank, Malena Guerrieri, Mariana Lopez, Pablo Grinberg, Ricardo Alfieri, Zooligan.
-                </span>
-              </div>
-
-              {/* Logos row */}
-              <div className="flex justify-center items-center gap-4 md:gap-6 max-md:flex-wrap">
-                <img
-                  src={imgVectorSmartObject}
-                  alt=""
-                  className="h-[30px] md:h-[40px] w-auto object-contain"
-                />
-                <img
-                  src={imgHog}
-                  alt=""
-                  className="h-[20px] md:h-[25px] w-auto object-contain"
-                />
-                <img
-                  src={imgAmaras}
-                  alt="Amaras"
-                  className="h-[35px] md:h-[45px] w-auto object-contain"
-                />
-                <img
-                  src={imgFallenGrape}
-                  alt=""
-                  className="h-[35px] md:h-[45px] w-auto object-contain"
-                />
-                <img
-                  src={imgEstrella}
-                  alt=""
-                  className="h-[45px] md:h-[60px] w-auto object-contain"
-                />
-                <div
-                  className="text-[#c6c2b4]"
-                  style={{
-                    fontFamily: 'Futura, Poppins',
-                    fontWeight: 600,
-                    fontSize: 'clamp(13px, 1.4vw, 19px)',
-                    letterSpacing: '0.12em',
-                  }}
-                >
-                  FUTBOLITIS
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Texture overlay */}
-        <div className="absolute inset-0 opacity-24 mix-blend-plus-lighter pointer-events-none">
-          <img
-            src={imgLayer6}
-            alt=""
-            className="w-full h-full object-cover"
-          />
+        <div aria-hidden="true" style={{ position: 'absolute', left: 'calc(62px + clamp(22px,5vw,72px))', bottom: '26px', zIndex: 2, display: 'flex', alignItems: 'center', gap: '10px', color: T.inkFaint, fontSize: '10px', letterSpacing: '.22em', textTransform: 'uppercase' }}>
+          <span style={{ width: '46px', height: '1px', background: T.sand, transformOrigin: 'left', animation: 'scrollcue 2.6s ease-in-out infinite' }} />
+          Scroll
         </div>
       </section>
 
-      {/* Thursday Dinner Booking */}
-      <section className="fade-section relative flex flex-col md:flex-row min-h-screen">
+      <main style={{ marginLeft: '62px' }}>
 
-        {/* Left — full-bleed photo */}
-        <div className="relative md:w-1/2 min-h-[50vh] md:min-h-screen overflow-hidden">
-          <img
-            src={dinnerImage}
-            alt="Thursday Dinner at POD"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            style={{ transform: 'scale(1.04)', transition: 'transform 8s ease' }}
-          />
-          {/* Dark gradient from bottom */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #0D0D0D 0%, rgba(13,13,13,0.3) 50%, transparent 100%)' }} />
-          {/* Dark gradient from right edge (blends into right panel) */}
-          <div className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(to right, transparent 60%, #0D0D0D 100%)' }} />
-
-          {/* Editorial line over photo */}
-          <div className="absolute bottom-0 left-0 p-10 md:p-14">
-            <div style={{ fontFamily: 'Poppins', fontSize: '9px', fontWeight: 600, letterSpacing: '4px', color: 'rgba(239,239,224,0.5)', marginBottom: '12px' }}>
-              EVERY THURSDAY
+        {/* Exhibition band */}
+        <section style={{ padding: 'clamp(64px,9vw,140px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2 }}>
+          {/* Green / Orange split */}
+          <div style={{ position: 'relative', minHeight: '60vh', overflow: 'hidden', marginBottom: 'clamp(48px,7vw,90px)' }}>
+            <div style={{ position: 'absolute', inset: 0, top: 0, height: '50%', background: '#326B3E' }}>
+              <div style={{ position: 'absolute', inset: 0, padding: '5% 8%' }}>
+                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                  <img src={imgRectangle2} alt="" style={{ position: 'absolute', left: '1%', top: '8%', width: '48%', objectFit: 'contain' }} />
+                  <img src={imgRectangle3} alt="" style={{ position: 'absolute', right: '1%', top: '6%', width: '43%', objectFit: 'contain' }} />
+                  <img src={imgLayer2} alt="" style={{ position: 'absolute', left: '52%', top: '27%', width: '13%', objectFit: 'contain' }} />
+                  <img src={imgLayer3} alt="" style={{ position: 'absolute', right: '8%', top: '52%', width: '11%', objectFit: 'contain' }} />
+                  <img src={imgLayer4} alt="" style={{ position: 'absolute', left: '54%', top: '75%', width: '12%', objectFit: 'contain' }} />
+                  <img src={imgLayer5} alt="" style={{ position: 'absolute', right: '10%', top: '68%', width: '11%', objectFit: 'contain' }} />
+                </div>
+              </div>
             </div>
-            <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(28px, 4vw, 52px)', color: '#EFEFE0', lineHeight: 1.15 }}>
-              A table where<br />art meets appetite.
+            <div style={{ position: 'absolute', inset: 0, top: '50%', background: '#A52B0A' }}>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '5% 8%', textAlign: 'center' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+                  <h1 style={{ fontFamily: T.mexcellent, fontWeight: 'normal', fontSize: 'clamp(48px,10vw,140px)', lineHeight: 1, letterSpacing: '.01em', color: '#c6c2b4', marginBottom: '16px' }}>LA PELOTA NO SE MANCHA</h1>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '24px', padding: '0 0' }}>
+                    {['ART EXHIBITION', '5 JUNE - 29 JULY'].map(t => (
+                      <div key={t} style={{ fontFamily: T.mexcellent, fontWeight: 'normal', fontSize: 'clamp(20px,3.5vw,48px)', lineHeight: 1, letterSpacing: '.01em', color: '#c6c2b4' }}>{t}</div>
+                    ))}
+                  </div>
+                  <div style={{ fontFamily: T.sans, fontSize: 'clamp(9px,0.9vw,12px)', lineHeight: 1.6, opacity: .75, color: '#c6c2b4', maxWidth: '800px', margin: '0 auto 20px' }}>
+                    <span style={{ fontWeight: 600 }}>Curated by:</span> Ezequiel Suranyi. <span style={{ fontWeight: 600 }}>Artists:</span> Alistair Woods, Carlos Herrera, Carlos Sarraf, Dani Yako, Eduardo Longoni, Ezequiel Suranyi, Giovanni de Cataldo, Grant Fleming, Hans Van der Meer, Jordi Alós, Jorge Viejo, Jürgen Rank, Malena Guerrieri, Mariana Lopez, Pablo Grinberg, Ricardo Alfieri, Zooligan.
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                    {[imgVectorSmartObject, imgHog, imgAmaras, imgFallenGrape, imgEstrella].map((src, i) => (
+                      <img key={i} src={src} alt="" style={{ height: i === 4 ? '45px' : i === 0 ? '30px' : '35px', width: 'auto', objectFit: 'contain' }} />
+                    ))}
+                    <div style={{ fontFamily: 'Futura, Inter, sans-serif', fontWeight: 600, fontSize: 'clamp(13px,1.4vw,19px)', letterSpacing: '.12em', color: '#c6c2b4' }}>FUTBOLITIS</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ position: 'absolute', inset: 0, opacity: .24, mixBlendMode: 'plus-lighter', pointerEvents: 'none' }}>
+              <img src={imgLayer6} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           </div>
-        </div>
 
-        {/* Right — menu & CTA */}
-        <div
-          className="md:w-1/2 flex flex-col justify-center px-10 md:px-16 py-16 md:py-24"
-          style={{ background: '#0D0D0D' }}
-        >
-          <div className="max-w-[480px]">
-
-            {/* Label */}
-            <div style={{ fontFamily: 'Poppins', fontSize: '9px', fontWeight: 600, letterSpacing: '4px', color: 'rgba(239,239,224,0.4)', marginBottom: '20px' }}>
-              WEEKLY GATHERING · CONDESA
-            </div>
-
-            {/* Title */}
-            <h2 style={{ fontFamily: 'Playfair Display', fontWeight: 900, fontSize: 'clamp(36px, 4vw, 60px)', color: '#EFEFE0', lineHeight: 1.05, marginBottom: '8px' }}>
-              Thursday<br />Dinners
-            </h2>
-            <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '13px', color: 'rgba(239,239,224,0.45)', marginBottom: '32px' }}>
-              June 5 · 8:00 PM · Nuevo León 108
-            </div>
-
-            {/* Divider */}
-            <div style={{ height: '1px', background: 'linear-gradient(to right, rgba(239,239,224,0.2), transparent)', marginBottom: '28px' }} />
-
-            {/* Chef + Experience tags */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '28px' }}>
-              {[
-                { icon: '◎', label: 'Chef Andrés Kerbel Laiter' },
-                { icon: '♩', label: 'Live performance & DJ' },
-                { icon: '◈', label: 'Mezcal Amaraz' },
-              ].map(({ icon, label }) => (
-                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '6px 12px', border: '1px solid rgba(239,239,224,0.12)', background: 'rgba(239,239,224,0.04)' }}>
-                  <span style={{ fontSize: '10px', color: 'rgba(239,239,224,0.4)' }}>{icon}</span>
-                  <span style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '9px', letterSpacing: '1px', color: 'rgba(239,239,224,0.6)' }}>{label}</span>
+          {/* Exhibition meta */}
+          <div className="fx" style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,230px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start', marginBottom: 'clamp(48px,7vw,90px)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {[['Current exhibition', 'Group show'], ['Dates', 'Jun 6 — Aug 30, 2026'], ['Location', 'Av. Nuevo León 108,\nHipódromo Condesa, CDMX']].map(([label, val]) => (
+                <div key={label}>
+                  <span style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '7px' }}>{label}</span>
+                  <div style={{ fontFamily: T.serif, fontSize: '1.05rem', color: T.ink, lineHeight: 1.4, whiteSpace: 'pre-line' }}>{val}</div>
                 </div>
               ))}
             </div>
-
-            {/* Description */}
-            <p style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '14px', lineHeight: 1.9, color: 'rgba(239,239,224,0.65)', marginBottom: '36px' }}>
-              An intimate gathering of 36 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls. The night ends with a live performance and DJ set.
-            </p>
-
-            {/* Menu courses */}
-            <div style={{ marginBottom: '36px' }}>
-              <div style={{ fontFamily: 'Poppins', fontSize: '8px', fontWeight: 600, letterSpacing: '3px', color: 'rgba(239,239,224,0.3)', marginBottom: '16px' }}>
-                THE MENU · · ·
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                {[
-                  { dish: 'Listones del Huerto', desc: 'Labneh · garbanzo al za\'atar · pepino · vinagreta de hierbas', wine: 'Verdejo · Vinho Verde' },
-                  { dish: 'Cous Cous Cremoso', desc: 'Feta · kalamata · jitomate deshidratado · alcachofa', wine: 'Falanghina · Sauv Blanc de BDX' },
-                  { dish: 'Pesca Levantina', desc: 'Pescado al sumac · tahini tibio · broccolini al harissa', wine: 'Assyrtiko · Riesling Alemán Seco' },
-                  { dish: 'Sesame Cheesecake', desc: 'Crust de ajonjolí · melaza de granada · frutos secos', wine: 'Donnafugata Ben Ryé · Vin Santo' },
-                ].map(({ dish, desc, wine }) => (
-                  <div key={dish} style={{ display: 'flex', gap: '16px', paddingBottom: '18px', borderBottom: '1px solid rgba(239,239,224,0.06)' }}>
-                    <div style={{ width: '4px', minWidth: '4px', height: '4px', borderRadius: '50%', background: 'rgba(239,239,224,0.3)', marginTop: '7px' }} />
-                    <div>
-                      <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '16px', color: '#EFEFE0', lineHeight: 1.2, marginBottom: '4px' }}>
-                        {dish}
-                      </div>
-                      <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '11px', color: 'rgba(239,239,224,0.45)', marginBottom: '4px', lineHeight: 1.5 }}>
-                        {desc}
-                      </div>
-                      <div style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '9px', letterSpacing: '1.5px', color: 'rgba(239,239,224,0.3)' }}>
-                        {wine}
-                      </div>
-                    </div>
-                  </div>
+            <div className="fx">
+              <p style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(1.4rem,2.6vw,2rem)', lineHeight: 1.45, color: T.ink, margin: '0 0 1.4em', maxWidth: '26ch' }}>
+                A study of texture, light and the body — staged as one continuous, sunlit room.
+              </p>
+              <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '15px', lineHeight: 1.8, color: T.inkDim, maxWidth: '54ch', margin: 0 }}>
+                POD Art House presents <em>La Pelota No Se Mancha</em>: a group exhibition where football culture meets contemporary art. Painting, photography and moving image gathered into a single sensorial environment in the heart of Condesa.
+              </p>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const, marginTop: '26px' }}>
+                {['Painting', 'Photography', 'Moving image'].map(t => (
+                  <span key={t} style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.ink, background: 'transparent', border: `1px solid ${T.border}`, borderRadius: '40px', padding: '9px 16px' }}>{t}</span>
                 ))}
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Price + scarcity */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '28px' }}>
-              <div>
-                <div style={{ fontFamily: 'Playfair Display', fontStyle: 'italic', fontSize: '42px', color: '#EFEFE0', lineHeight: 1 }}>
-                  MX$1,500
-                </div>
-                <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '11px', color: 'rgba(239,239,224,0.4)', marginTop: '4px' }}>
-                  por persona · maridaje incluido
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '11px', color: '#EFEFE0' }}>
-                  36 seats
-                </div>
-                <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '10px', color: 'rgba(239,239,224,0.35)', marginTop: '2px' }}>
-                  limited availability
-                </div>
-              </div>
+        <div style={{ height: '1px', background: T.borderFaint, margin: '0 clamp(22px,5vw,72px)' }} />
+
+        {/* Events filmstrip */}
+        <section id="events" style={{ padding: 'clamp(64px,9vw,140px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '24px', flexWrap: 'wrap' as const, marginBottom: 'clamp(34px,4vw,56px)' }}>
+            <div>
+              <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>POD Art House</span>
+              <h2 className="fx" style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(2.6rem,6vw,3.4rem)', lineHeight: 1, color: T.ink, margin: '.28em 0 0' }}>What's On</h2>
+              <p style={{ fontFamily: T.sans, fontSize: '13px', color: T.inkDim, letterSpacing: '.02em' }}>Curated experiences. Limited capacity.</p>
             </div>
-
-            {/* CTA */}
-            <button
-              onClick={() => setBookingOpen(true)}
-              className="w-full py-5 tracking-[4px] hover:opacity-90 active:scale-[0.99] transition-all duration-200"
-              style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '11px', background: '#EFEFE0', color: '#0D0D0D', border: 'none', cursor: 'pointer' }}
-            >
-              RESERVE YOUR TABLE
-            </button>
-
-            <div style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '10px', color: 'rgba(239,239,224,0.25)', textAlign: 'center', marginTop: '14px' }}>
-              Reservación confirmada al pagar · Mezcal Amaraz incluido
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint }}>{EVENTS.length} upcoming</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {(['prev', 'next'] as const).map(dir => (
+                  <button key={dir} onClick={() => stripRef.current?.scrollBy({ left: dir === 'prev' ? -320 : 320, behavior: 'smooth' })}
+                    style={{ width: '42px', height: '42px', borderRadius: '50%', border: `1px solid ${T.border}`, background: 'transparent', color: T.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '16px' }}>
+                    {dir === 'prev' ? '←' : '→'}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
+          <div ref={stripRef} className="filmstrip">
+            {EVENTS.map((ev, i) => (
+              <article key={i} style={{ flex: '0 0 clamp(240px,26vw,300px)', scrollSnapAlign: 'start' }}>
+                <div style={{ position: 'relative', width: '100%', paddingBottom: '125%', overflow: 'hidden', background: ev.dinner ? 'transparent' : T.surface, border: `1px solid ${T.borderFaint}` }}>
+                  {ev.dinner ? (
+                    <img src={dinnerImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.sand, opacity: .7 }}>{ev.type}</span>
+                    </div>
+                  )}
+                  <span style={{ position: 'absolute', top: '12px', left: '13px', zIndex: 3, fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.14em', color: T.inkDim }}>{String(i + 1).padStart(2, '0')}</span>
+                  {ev.dinner && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(13,13,13,0.7) 0%, transparent 60%)' }} />}
+                </div>
+                <div style={{ paddingTop: '16px' }}>
+                  <span style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 600, fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: '#0D0D0D', background: T.sand, padding: '6px 11px', borderRadius: '3px' }}>{ev.day} · {ev.d}</span>
+                  <h3 style={{ fontFamily: T.serif, fontWeight: 500, fontSize: '1.4rem', lineHeight: 1.12, color: T.ink, margin: '13px 0 8px' }}>{ev.n}</h3>
+                  <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.18em', textTransform: 'uppercase', color: T.inkFaint }}>{ev.type}</div>
+                  <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '13px', lineHeight: 1.65, color: T.inkDim, margin: '12px 0 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{ev.desc}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px', paddingTop: '14px', borderTop: `1px solid ${T.borderFaint}` }}>
+                    <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '12px', letterSpacing: '.08em', color: T.sand }}>{ev.t}</span>
+                    {ev.dinner ? (
+                      <button onClick={() => setBookingOpen(true)} style={{ background: 'transparent', border: 'none', color: T.sand, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.14em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '7px', cursor: 'pointer' }}>
+                        Book <span>→</span>
+                      </button>
+                    ) : (
+                      <button onClick={() => setRsvpIdx(i)} style={{ background: 'transparent', border: 'none', color: isReserved(i) ? T.inkFaint : T.sand, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.14em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '7px', cursor: 'pointer' }}>
+                        {isReserved(i) ? 'Reserved ✓' : 'RSVP'} {!isReserved(i) && <span>→</span>}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* Thursday Dinner full section */}
+        <section style={{ display: 'flex', flexDirection: 'column' as const }} className="md:flex-row">
+          <div style={{ position: 'relative', flex: 1, minHeight: '50vh' }}>
+            <img src={dinnerImage} alt="Thursday Dinner at POD" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #0D0D0D 0%, rgba(13,13,13,0.3) 50%, transparent 100%)' }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, padding: 'clamp(32px,5vw,56px)' }}>
+              <div style={{ fontFamily: T.sans, fontSize: '9px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '12px' }}>EVERY THURSDAY</div>
+              <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(28px,4vw,52px)', color: T.ink, lineHeight: 1.15 }}>A table where<br />art meets appetite.</div>
+            </div>
+          </div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'center', padding: 'clamp(48px,8vw,96px) clamp(32px,6vw,72px)', background: T.bg }}>
+            <div style={{ maxWidth: '480px' }}>
+              <div style={{ fontFamily: T.sans, fontSize: '9px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '20px' }}>WEEKLY GATHERING · CONDESA</div>
+              <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(36px,4vw,60px)', color: T.ink, lineHeight: 1.05, margin: '0 0 8px' }}>Thursday<br />Dinners</h2>
+              <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '13px', color: T.inkFaint, marginBottom: '32px' }}>June 5 · 8:00 PM · Nuevo León 108</div>
+              <div style={{ height: '1px', background: `linear-gradient(to right, ${T.border}, transparent)`, marginBottom: '32px' }} />
+              <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '10px', marginBottom: '28px' }}>
+                {[['◎', 'Chef Andrés Kerbel Laiter'], ['♩', 'Live performance & DJ'], ['◈', 'Mezcal Amaraz']].map(([icon, label]) => (
+                  <div key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '6px 12px', border: `1px solid ${T.borderFaint}`, background: 'rgba(245,240,232,0.04)' }}>
+                    <span style={{ fontSize: '10px', color: T.inkFaint }}>{icon}</span>
+                    <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '9px', letterSpacing: '1px', color: T.inkDim }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '14px', lineHeight: 1.9, color: T.inkDim, marginBottom: '36px' }}>
+                An intimate gathering of 36 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls. The night ends with a live performance and DJ set.
+              </p>
+              <div style={{ marginBottom: '36px' }}>
+                <div style={{ fontFamily: T.sans, fontSize: '8px', fontWeight: 600, letterSpacing: '3px', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '16px' }}>THE MENU · · ·</div>
+                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '18px' }}>
+                  {[
+                    { dish: 'Listones del Huerto', desc: "Labneh · garbanzo al za'atar · pepino · vinagreta de hierbas", wine: 'Verdejo · Vinho Verde' },
+                    { dish: 'Cous Cous Cremoso', desc: 'Feta · kalamata · jitomate deshidratado · alcachofa', wine: 'Falanghina · Sauv Blanc de BDX' },
+                    { dish: 'Pesca Levantina', desc: 'Pescado al sumac · tahini tibio · broccolini al harissa', wine: 'Assyrtiko · Riesling Alemán Seco' },
+                    { dish: 'Sesame Cheesecake', desc: 'Crust de ajonjolí · melaza de granada · frutos secos', wine: 'Donnafugata Ben Ryé · Vin Santo' },
+                  ].map(({ dish, desc, wine }) => (
+                    <div key={dish} style={{ display: 'flex', gap: '16px', paddingBottom: '18px', borderBottom: `1px solid ${T.borderFaint}` }}>
+                      <div style={{ width: '4px', minWidth: '4px', height: '4px', borderRadius: '50%', background: T.inkFaint, marginTop: '7px' }} />
+                      <div>
+                        <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '16px', color: T.ink, lineHeight: 1.2, marginBottom: '4px' }}>{dish}</div>
+                        <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '11px', color: T.inkFaint, marginBottom: '4px', lineHeight: 1.5 }}>{desc}</div>
+                        <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '9px', letterSpacing: '1.5px', color: 'rgba(245,240,232,0.3)' }}>{wine}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '28px' }}>
+                <div>
+                  <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '42px', color: T.ink, lineHeight: 1 }}>MX$1,500</div>
+                  <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '11px', color: T.inkFaint, marginTop: '4px' }}>por persona · maridaje incluido</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontFamily: T.sans, fontWeight: 600, fontSize: '11px', color: T.ink }}>36 seats</div>
+                  <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '10px', color: T.inkFaint, marginTop: '2px' }}>limited availability</div>
+                </div>
+              </div>
+              <button onClick={() => setBookingOpen(true)} style={{ width: '100%', padding: '18px', fontFamily: T.sans, fontWeight: 700, fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', background: T.ink, color: '#0D0D0D', border: 'none', cursor: 'pointer' }}>
+                RESERVE YOUR TABLE
+              </button>
+              <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '10px', color: 'rgba(245,240,232,0.25)', textAlign: 'center', marginTop: '14px' }}>
+                Reservación confirmada al pagar · Mezcal Amaraz incluido
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer id="contact" style={{ padding: 'clamp(48px,7vw,90px) clamp(22px,5vw,72px) 40px', borderTop: `1px solid ${T.borderFaint}`, position: 'relative', zIndex: 2 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '30px', flexWrap: 'wrap' as const, alignItems: 'flex-start', marginBottom: '48px' }}>
+            <div style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(2rem,5vw,3rem)', lineHeight: 1, color: T.ink }}>POD Art House</div>
+            <div style={{ fontFamily: T.sans, fontSize: '13px', lineHeight: 1.9, color: T.inkDim, textAlign: 'right' }}>
+              Av. Nuevo León 108<br />Hipódromo Condesa<br />Ciudad de México<br />
+              <span style={{ color: T.sand }}>@podarthouse</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, paddingTop: '22px', borderTop: `1px solid ${T.borderFaint}` }}>
+            {['Productivity · Wellness · Art · Community', '© 2026 POD Art House'].map(t => (
+              <span key={t} style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.12em', textTransform: 'uppercase', color: T.inkFaint }}>{t}</span>
+            ))}
+          </div>
+        </footer>
+      </main>
+
+      {/* Sticky bar */}
+      <div style={{ position: 'fixed', left: '62px', right: 0, bottom: 0, zIndex: 38, transform: stickyShow ? 'translateY(0)' : 'translateY(110%)', transition: 'transform .5s cubic-bezier(.2,.7,.3,1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, padding: '15px clamp(22px,5vw,72px)', background: 'rgba(13,13,13,0.9)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${T.sand}` }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
+            <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '1.25rem', color: T.ink }}>La Pelota No Se Mancha</span>
+            <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>On View — Summer 2026</span>
+          </div>
+          <a href="#events" style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.16em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', textDecoration: 'none' }}>
+            Reserve access <span>→</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Overlay */}
+      {overlayOpen && (
+        <div onClick={(e) => { if (e.target === e.currentTarget) { setRsvpIdx(null); setGalleryOpen(false); } }}
+          style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'rgba(8,8,8,0.72)', backdropFilter: 'blur(5px)' }}>
+          {rsvpIdx !== null && (
+            <RSVPSheet eventIdx={rsvpIdx} onClose={() => setRsvpIdx(null)} onSave={(card) => { saveCard(card); }} />
+          )}
+          {galleryOpen && (
+            <GallerySheet gallery={gallery} onClose={() => setGalleryOpen(false)} onRemove={(id) => { removeCard(id); }} />
+          )}
+        </div>
+      )}
+
+      {/* Booking flow (Stripe — Thursday dinner) */}
       {bookingOpen && <BookingFlow onClose={() => setBookingOpen(false)} />}
 
-      {/* Footer */}
-      <footer id="contact" className="bg-[#1A1A1A] py-20 px-[80px] md:px-[80px] px-5">
-        <div className="max-w-[1440px] mx-auto">
-          <div className="grid md:grid-cols-2 gap-20 mb-20">
-            <div>
-              <div
-                className="text-[#CDCDB9] mb-2"
-                style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '12px', lineHeight: '1.8' }}
-              >
-                Nuevo León 108
-                <br />
-                Condesa, CDMX
-              </div>
-            </div>
-
-            <div className="md:text-right">
-              <div
-                className="text-[#CDCDB9] mb-2"
-                style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '12px' }}
-              >
-                @podcondesa
-              </div>
-              <div
-                className="text-[#CDCDB9]"
-                style={{ fontFamily: 'Poppins', fontWeight: 300, fontSize: '12px' }}
-              >
-                hola@podcondesa.com
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <div
-              className="text-[#CDCDB9] opacity-40"
-              style={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '9px' }}
-            >
-              © 2025 POD ART HOUSE
-            </div>
-          </div>
-        </div>
-      </footer>
-    </main>
+      {/* Toast */}
+      <div style={{ position: 'fixed', left: '50%', bottom: '28px', transform: `translateX(-50%) translateY(${toast ? '0' : '24px'})`, zIndex: 120, background: T.ink, color: '#0D0D0D', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.1em', textTransform: 'uppercase', padding: '13px 22px', borderRadius: '40px', opacity: toast ? 1 : 0, transition: 'all .35s cubic-bezier(.2,.8,.3,1)', pointerEvents: 'none' }}>
+        {toast}
+      </div>
+    </div>
   );
 }
