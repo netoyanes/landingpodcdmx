@@ -93,7 +93,7 @@ function genFolio() { return '№ ' + String(Math.floor(1000 + Math.random() * 9
 
 async function downloadCard(el: HTMLElement, filename: string) {
   const { default: html2canvas } = await import('html2canvas');
-  const canvas = await html2canvas(el, { backgroundColor: '#1A1A1A', scale: 2, useCORS: true, logging: false });
+  const canvas = await html2canvas(el, { backgroundColor: '#1A1A1A', scale: 4, useCORS: true, logging: false });
   const link = document.createElement('a');
   link.download = filename;
   link.href = canvas.toDataURL('image/png');
