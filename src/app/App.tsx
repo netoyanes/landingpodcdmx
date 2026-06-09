@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import BookingFlow from './components/BookingFlow';
 import heroImage from '../imports/image.png';
-import dinnerImage from '../imports/IMG_2842.JPG';
+import dinnerImage from '../imports/IMG_2842.JPG'; // used in filmstrip for dinner events
 
 /* ── design tokens ─────────────────────────────────────── */
 const T = {
@@ -444,73 +444,6 @@ export default function App() {
                 </div>
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* Thursday Dinner full section */}
-        <section style={{ display: 'flex', flexDirection: 'column' as const }} className="md:flex-row">
-          <div style={{ position: 'relative', flex: 1, minHeight: '50vh' }}>
-            <img src={dinnerImage} alt="Thursday Dinner at POD" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #0D0D0D 0%, rgba(13,13,13,0.3) 50%, transparent 100%)' }} />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, padding: 'clamp(32px,5vw,56px)' }}>
-              <div style={{ fontFamily: T.sans, fontSize: '9px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '12px' }}>EVERY THURSDAY</div>
-              <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(28px,4vw,52px)', color: T.ink, lineHeight: 1.15 }}>A table where<br />art meets appetite.</div>
-            </div>
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, justifyContent: 'center', padding: 'clamp(48px,8vw,96px) clamp(32px,6vw,72px)', background: T.bg }}>
-            <div style={{ maxWidth: '480px' }}>
-              <div style={{ fontFamily: T.sans, fontSize: '9px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '20px' }}>WEEKLY GATHERING · CONDESA</div>
-              <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(36px,4vw,60px)', color: T.ink, lineHeight: 1.05, margin: '0 0 8px' }}>Thursday<br />Dinners</h2>
-              <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '13px', color: T.inkFaint, marginBottom: '32px' }}>June 5 · 8:00 PM · Nuevo León 108</div>
-              <div style={{ height: '1px', background: `linear-gradient(to right, ${T.border}, transparent)`, marginBottom: '32px' }} />
-              <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '10px', marginBottom: '28px' }}>
-                {[['◎', 'Chef Andrés Kerbel Laiter'], ['♩', 'Live performance & DJ'], ['◈', 'Mezcal Amaraz']].map(([icon, label]) => (
-                  <div key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '6px 12px', border: `1px solid ${T.borderFaint}`, background: 'rgba(245,240,232,0.04)' }}>
-                    <span style={{ fontSize: '10px', color: T.inkFaint }}>{icon}</span>
-                    <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '9px', letterSpacing: '1px', color: T.inkDim }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-              <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '14px', lineHeight: 1.9, color: T.inkDim, marginBottom: '36px' }}>
-                An intimate gathering of 36 guests inside the gallery. Four courses, four wines — each one chosen to extend the conversation already happening on the walls. The night ends with a live performance and DJ set.
-              </p>
-              <div style={{ marginBottom: '36px' }}>
-                <div style={{ fontFamily: T.sans, fontSize: '8px', fontWeight: 600, letterSpacing: '3px', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '16px' }}>THE MENU · · ·</div>
-                <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '18px' }}>
-                  {[
-                    { dish: 'Listones del Huerto', desc: "Labneh · garbanzo al za'atar · pepino · vinagreta de hierbas", wine: 'Verdejo · Vinho Verde' },
-                    { dish: 'Cous Cous Cremoso', desc: 'Feta · kalamata · jitomate deshidratado · alcachofa', wine: 'Falanghina · Sauv Blanc de BDX' },
-                    { dish: 'Pesca Levantina', desc: 'Pescado al sumac · tahini tibio · broccolini al harissa', wine: 'Assyrtiko · Riesling Alemán Seco' },
-                    { dish: 'Sesame Cheesecake', desc: 'Crust de ajonjolí · melaza de granada · frutos secos', wine: 'Donnafugata Ben Ryé · Vin Santo' },
-                  ].map(({ dish, desc, wine }) => (
-                    <div key={dish} style={{ display: 'flex', gap: '16px', paddingBottom: '18px', borderBottom: `1px solid ${T.borderFaint}` }}>
-                      <div style={{ width: '4px', minWidth: '4px', height: '4px', borderRadius: '50%', background: T.inkFaint, marginTop: '7px' }} />
-                      <div>
-                        <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '16px', color: T.ink, lineHeight: 1.2, marginBottom: '4px' }}>{dish}</div>
-                        <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '11px', color: T.inkFaint, marginBottom: '4px', lineHeight: 1.5 }}>{desc}</div>
-                        <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '9px', letterSpacing: '1.5px', color: 'rgba(245,240,232,0.3)' }}>{wine}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '28px' }}>
-                <div>
-                  <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '42px', color: T.ink, lineHeight: 1 }}>MX$1,500</div>
-                  <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '11px', color: T.inkFaint, marginTop: '4px' }}>por persona · maridaje incluido</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontFamily: T.sans, fontWeight: 600, fontSize: '11px', color: T.ink }}>36 seats</div>
-                  <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '10px', color: T.inkFaint, marginTop: '2px' }}>limited availability</div>
-                </div>
-              </div>
-              <button onClick={() => setBookingOpen(true)} style={{ width: '100%', padding: '18px', fontFamily: T.sans, fontWeight: 700, fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', background: T.ink, color: '#0D0D0D', border: 'none', cursor: 'pointer' }}>
-                RESERVE YOUR TABLE
-              </button>
-              <div style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '10px', color: 'rgba(245,240,232,0.25)', textAlign: 'center', marginTop: '14px' }}>
-                Reservación confirmada al pagar · Mezcal Amaraz incluido
-              </div>
-            </div>
           </div>
         </section>
 
