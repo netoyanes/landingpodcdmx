@@ -609,7 +609,7 @@ export default function App() {
             <div className="exhibit-grid fx" style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,230px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start' }}>
               <div>
                 <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>Reserve access</span>
-                <div style={{ fontFamily: T.serif, fontSize: '1.02rem', color: T.inkDim, lineHeight: 1.5, marginTop: '10px' }}>Join the guest list for the opening and private viewing hours.</div>
+                <div style={{ fontFamily: T.serif, fontSize: '1.02rem', color: T.inkDim, lineHeight: 1.5, marginTop: '10px' }}>Join the guest list.</div>
               </div>
               <div className="fx">
                 <InlineRSVP EVENTS={EVENTS} onSave={saveCard} onGallery={() => setGalleryOpen(true)} />
