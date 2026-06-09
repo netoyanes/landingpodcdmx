@@ -176,7 +176,14 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
     setErrors({ name: !nameOk, email: !emailOk });
     if (!nameOk || !emailOk) return;
-    setCard({ id: Date.now(), folio: genFolio(), name: name.trim(), email: email.trim(), ig: ig.trim() ? (ig[0] === '@' ? ig.trim() : '@' + ig.trim()) : '', kind: target.kind, refIdx: target.refIdx });
+    const igClean = ig.trim() ? (ig[0] === '@' ? ig.trim() : '@' + ig.trim()) : '';
+    const newCard: SavedCard = { id: Date.now(), folio: genFolio(), name: name.trim(), email: email.trim(), ig: igClean, kind: target.kind, refIdx: target.refIdx };
+    setCard(newCard);
+    fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim(), email: email.trim(), ig: igClean, kind: target.kind, eventTitle: r.title }),
+    }).catch(() => {});
   };
 
   return (
@@ -298,7 +305,13 @@ function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (c
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
     setErrors({ name: !nameOk, email: !emailOk });
     if (!nameOk || !emailOk) return;
-    setCard({ id: Date.now(), folio: genFolio(), name: name.trim(), email: email.trim(), ig: ig.trim() ? (ig[0] === '@' ? ig.trim() : '@' + ig.trim()) : '', kind: 'exhibition' });
+    const igClean = ig.trim() ? (ig[0] === '@' ? ig.trim() : '@' + ig.trim()) : '';
+    setCard({ id: Date.now(), folio: genFolio(), name: name.trim(), email: email.trim(), ig: igClean, kind: 'exhibition' });
+    fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim(), email: email.trim(), ig: igClean, kind: 'exhibition', eventTitle: EXHIBITION.title }),
+    }).catch(() => {});
   };
 
   if (card) {
