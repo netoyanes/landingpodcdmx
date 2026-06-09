@@ -161,6 +161,7 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
 }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [ig, setIg] = useState('');
   const [errors, setErrors] = useState({ name: false, email: false });
   const [card, setCard] = useState<SavedCard | null>(null);
@@ -182,7 +183,7 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
     fetch('/api/rsvp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), email: email.trim(), ig: igClean, kind: target.kind, eventTitle: r.title }),
+      body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), ig: igClean, kind: target.kind, eventTitle: r.title }),
     }).then(async res => {
       if (!res.ok) console.error('[RSVP]', res.status, await res.text());
       else console.log('[RSVP] saved to Airtable');
@@ -216,6 +217,11 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
                 {f.err && <div style={{ fontSize: '10px', color: '#c47a63', marginTop: '5px', letterSpacing: '.04em' }}>{f.msg}</div>}
               </div>
             ))}
+            <div>
+              <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>Phone <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
+              <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+52 55 0000 0000"
+                style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
+            </div>
             <div>
               <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>Instagram <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
               <input value={ig} onChange={e => setIg(e.target.value)} placeholder="@handle"
@@ -297,6 +303,7 @@ function GallerySheet({ gallery, EVENTS, onClose, onRemove }: { gallery: SavedCa
 function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (card: SavedCard) => void; onGallery: () => void }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [ig, setIg] = useState('');
   const [errors, setErrors] = useState({ name: false, email: false });
   const [card, setCard] = useState<SavedCard | null>(null);
@@ -313,7 +320,7 @@ function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (c
     fetch('/api/rsvp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), email: email.trim(), ig: igClean, kind: 'exhibition', eventTitle: EXHIBITION.title }),
+      body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), ig: igClean, kind: 'exhibition', eventTitle: EXHIBITION.title }),
     }).then(async res => {
       if (!res.ok) console.error('[RSVP]', res.status, await res.text());
       else console.log('[RSVP] saved to Airtable');
@@ -355,7 +362,12 @@ function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (c
             {f.err && <div style={{ fontSize: '10px', color: '#c47a63', marginTop: '5px' }}>{f.msg}</div>}
           </div>
         ))}
-        <div style={{ gridColumn: '1 / -1' }}>
+        <div>
+          <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>Phone <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
+          <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+52 55 0000 0000"
+            style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
+        </div>
+        <div>
           <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>Instagram <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
           <input value={ig} onChange={e => setIg(e.target.value)} placeholder="@handle"
             style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />

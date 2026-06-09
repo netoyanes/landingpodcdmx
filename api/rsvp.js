@@ -13,7 +13,7 @@ export default async function handler(req) {
     return new Response('Invalid JSON', { status: 400 });
   }
 
-  const { name, email, ig, kind, eventTitle } = body;
+  const { name, email, ig, phone, kind, eventTitle } = body;
   if (!name || !email) {
     return new Response(JSON.stringify({ error: 'name and email required' }), { status: 400 });
   }
@@ -23,21 +23,14 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ error: 'not configured' }), { status: 500 });
   }
 
-  const notes = [
-    ig ? `Instagram: ${ig}` : null,
-    kind === 'exhibition' ? 'RSVP: Exhibition' : 'RSVP: Event',
-  ].filter(Boolean).join('\n');
-
-  const payload = {
-    records: [{
-      fields: {
-        Name:                 name,
-        Email:                email,
-        'Brand/Event Name':   eventTitle || 'POD Art House',
-        Notes:                notes,
-      },
-    }],
+  const fields = {
+    Name:                   name,
+    Email:                  email,
+    'Brand/Event Name':     eventTitle || 'POD Art House',
+    Notes:                  kind === 'exhibition' ? 'RSVP: Exhibition' : 'RSVP: Event',
   };
+  if (phone) fields['Phone Number'] = phone;
+  if (ig)    fields['Company/Organization'] = ig;
 
   const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`, {
     method: 'POST',
@@ -45,7 +38,7 @@ export default async function handler(req) {
       Authorization:  `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ records: [{ fields }] }),
   });
 
   if (!res.ok) {
