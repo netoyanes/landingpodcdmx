@@ -30,7 +30,7 @@ export default async function handler(req) {
     Notes:                  kind === 'exhibition' ? 'RSVP: Exhibition' : 'RSVP: Event',
   };
   if (phone) fields['Phone Number'] = phone;
-  if (ig)    fields['Company/Organization'] = ig;
+  if (ig)    fields['Company/Organization/handle'] = ig;
 
   const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`, {
     method: 'POST',
