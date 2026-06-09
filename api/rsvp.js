@@ -31,7 +31,7 @@ export default async function handler(req) {
   };
   if (phone)           fields['Phone Number'] = phone;
   if (ig)              fields['Company/Organization/handle'] = ig;
-  if (airtableEventId) fields['ASANA EVENTS'] = [{ id: airtableEventId }];
+  if (airtableEventId) fields['EVENTS'] = [{ id: airtableEventId }];
 
   const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`, {
     method: 'POST',
