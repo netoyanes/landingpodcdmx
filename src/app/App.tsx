@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import heroImage from '../imports/image.png';
 import dinnerImage from '../imports/IMG_2842.JPG'; // used in filmstrip for dinner events
+import logoUrl from '../imports/logo.svg';
 
 /* ── design tokens ─────────────────────────────────────── */
 const T = {
@@ -657,7 +658,10 @@ export default function App() {
         {/* Footer */}
         <footer id="contact" style={{ padding: 'clamp(48px,7vw,90px) clamp(22px,5vw,72px) 40px', borderTop: `1px solid ${T.borderFaint}`, position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '30px', flexWrap: 'wrap' as const, alignItems: 'flex-start', marginBottom: '48px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+            <img src={logoUrl} alt="POD Art House" style={{ width: '40px', height: '40px', opacity: .9, color: T.ink }} />
             <div style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(2rem,5vw,3rem)', lineHeight: 1, color: T.ink }}>POD Art House</div>
+          </div>
             <div style={{ fontFamily: T.sans, fontSize: '13px', lineHeight: 1.9, color: T.inkDim, textAlign: 'right' as const }}>
               Av. Nuevo León 108<br />Hipódromo Condesa<br />Ciudad de México<br />
               <span style={{ color: T.sand }}>@podarthouse</span>
