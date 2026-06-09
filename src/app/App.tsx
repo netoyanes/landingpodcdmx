@@ -183,7 +183,10 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name.trim(), email: email.trim(), ig: igClean, kind: target.kind, eventTitle: r.title }),
-    }).catch(() => {});
+    }).then(async res => {
+      if (!res.ok) console.error('[RSVP]', res.status, await res.text());
+      else console.log('[RSVP] saved to Airtable');
+    }).catch(err => console.error('[RSVP] fetch failed', err));
   };
 
   return (
@@ -311,7 +314,10 @@ function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (c
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name.trim(), email: email.trim(), ig: igClean, kind: 'exhibition', eventTitle: EXHIBITION.title }),
-    }).catch(() => {});
+    }).then(async res => {
+      if (!res.ok) console.error('[RSVP]', res.status, await res.text());
+      else console.log('[RSVP] saved to Airtable');
+    }).catch(err => console.error('[RSVP] fetch failed', err));
   };
 
   if (card) {
