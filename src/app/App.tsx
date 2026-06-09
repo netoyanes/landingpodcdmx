@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import heroImage from '../imports/image.png';
 import dinnerImage from '../imports/IMG_2842.JPG'; // used in filmstrip for dinner events
 
@@ -88,6 +88,15 @@ interface SavedCard {
 
 function genFolio() { return '№ ' + String(Math.floor(1000 + Math.random() * 9000)); }
 
+async function downloadCard(el: HTMLElement, filename: string) {
+  const { default: html2canvas } = await import('html2canvas');
+  const canvas = await html2canvas(el, { backgroundColor: '#1A1A1A', scale: 2, useCORS: true, logging: false });
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
 function refOf(card: SavedCard, EVENTS: Event[]) {
   if (card.kind === 'exhibition') {
     return { title: EXHIBITION.title, type: 'Exhibition · On View', datePill: 'SUMMER 2026', time: 'On View' };
@@ -97,13 +106,13 @@ function refOf(card: SavedCard, EVENTS: Event[]) {
 }
 
 /* ── AccessPass ────────────────────────────────────────── */
-function AccessPass({ card, EVENTS }: { card: SavedCard; EVENTS: Event[] }) {
+const AccessPass = forwardRef<HTMLDivElement, { card: SavedCard; EVENTS: Event[] }>(function AccessPass({ card, EVENTS }, ref) {
   const r = refOf(card, EVENTS);
   const ev = card.kind === 'event' ? EVENTS[card.refIdx!] : null;
   const imgSrc = ev?.imageUrl || (ev?.dinner ? dinnerImage : null);
 
   return (
-    <div style={{ width: '312px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: '8px', boxShadow: '0 24px 60px -28px rgba(0,0,0,.9)', flexShrink: 0 }}>
+    <div ref={ref} style={{ width: '312px', background: T.surface, border: `1px solid ${T.border}`, borderRadius: '8px', boxShadow: '0 24px 60px -28px rgba(0,0,0,.9)', flexShrink: 0 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px 13px' }}>
         <span style={{ fontFamily: T.sans, fontWeight: 600, fontSize: '9.5px', letterSpacing: '.22em', textTransform: 'uppercase' as const, color: T.ink }}>POD ART HOUSE</span>
         <span style={{ fontFamily: T.sans, fontSize: '10px', letterSpacing: '.1em', color: T.inkFaint }}>{card.folio}</span>
@@ -141,7 +150,7 @@ function AccessPass({ card, EVENTS }: { card: SavedCard; EVENTS: Event[] }) {
       </div>
     </div>
   );
-}
+});
 
 /* ── RSVPSheet ─────────────────────────────────────────── */
 function RSVPSheet({ target, EVENTS, onClose, onSave }: {
@@ -156,6 +165,7 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
   const [errors, setErrors] = useState({ name: false, email: false });
   const [card, setCard] = useState<SavedCard | null>(null);
   const [saved, setSaved] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const r = target.kind === 'exhibition'
     ? { title: EXHIBITION.title, datePill: 'SUMMER 2026', time: 'On View', type: EXHIBITION.type }
@@ -212,16 +222,37 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const }}>
           <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.24em', textTransform: 'uppercase' as const, color: T.sand, marginBottom: '22px' }}>Your access card</div>
-          <AccessPass card={card} EVENTS={EVENTS} />
+          <AccessPass ref={cardRef} card={card} EVENTS={EVENTS} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '30px', flexWrap: 'wrap' as const, justifyContent: 'center' }}>
             <button onClick={() => { onSave(card); setSaved(true); }} disabled={saved}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase' as const, padding: '14px 26px', borderRadius: '2px', color: '#0D0D0D', background: saved ? T.inkFaint : T.sand, border: `1px solid ${saved ? T.inkFaint : T.sand}`, cursor: saved ? 'default' : 'pointer', opacity: saved ? .65 : 1 }}>
               {saved ? '✓ Saved to gallery' : 'Save to my gallery'}
             </button>
+            <button onClick={() => cardRef.current && downloadCard(cardRef.current, `pod-access-${card.folio.replace('№ ', '')}.png`)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'transparent', border: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.12em', textTransform: 'uppercase' as const, padding: '10px 18px', borderRadius: '2px', cursor: 'pointer' }}>
+              ↓ Download
+            </button>
             <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: T.inkDim, fontFamily: T.sans, fontWeight: 400, fontSize: '11px', letterSpacing: '.12em', textTransform: 'uppercase' as const, cursor: 'pointer' }}>Done</button>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── GalleryCard ───────────────────────────────────────── */
+function GalleryCard({ card, EVENTS, onRemove }: { card: SavedCard; EVENTS: Event[]; onRemove: (id: number) => void }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  return (
+    <div style={{ position: 'relative' }}>
+      <button onClick={() => onRemove(card.id)} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 6, width: '26px', height: '26px', borderRadius: '50%', border: `1px solid ${T.borderFaint}`, background: 'rgba(13,13,13,.7)', color: T.inkDim, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
+      <div ref={cardRef} style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '118%' }}>
+        <AccessPass card={card} EVENTS={EVENTS} />
+      </div>
+      <button onClick={() => cardRef.current && downloadCard(cardRef.current.firstElementChild as HTMLElement, `pod-access-${card.folio.replace('№ ', '')}.png`)}
+        style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'transparent', border: `1px solid ${T.border}`, color: T.inkDim, fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase' as const, padding: '7px 13px', borderRadius: '2px', cursor: 'pointer' }}>
+        ↓ Download
+      </button>
     </div>
   );
 }
@@ -245,14 +276,7 @@ function GallerySheet({ gallery, EVENTS, onClose, onRemove }: { gallery: SavedCa
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '26px' }}>
-          {gallery.map(c => (
-            <div key={c.id} style={{ position: 'relative' }}>
-              <button onClick={() => onRemove(c.id)} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 6, width: '26px', height: '26px', borderRadius: '50%', border: `1px solid ${T.borderFaint}`, background: 'rgba(13,13,13,.7)', color: T.inkDim, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
-              <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '118%' }}>
-                <AccessPass card={c} EVENTS={EVENTS} />
-              </div>
-            </div>
-          ))}
+          {gallery.map(c => <GalleryCard key={c.id} card={c} EVENTS={EVENTS} onRemove={onRemove} />)}
         </div>
       )}
     </div>
@@ -267,6 +291,7 @@ function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (c
   const [errors, setErrors] = useState({ name: false, email: false });
   const [card, setCard] = useState<SavedCard | null>(null);
   const [saved, setSaved] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const submit = () => {
     const nameOk = name.trim().length > 0;
@@ -280,12 +305,16 @@ function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (c
     return (
       <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '22px' }}>
         <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.24em', textTransform: 'uppercase' as const, color: T.sand }}>Your access card</div>
-        <AccessPass card={card} EVENTS={EVENTS} />
+        <AccessPass ref={cardRef} card={card} EVENTS={EVENTS} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' as const }}>
           <button onClick={() => { if (!saved) { onSave(card); setSaved(true); } }}
             disabled={saved}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase' as const, padding: '14px 26px', borderRadius: '2px', color: '#0D0D0D', background: saved ? T.inkFaint : T.sand, border: `1px solid ${saved ? T.inkFaint : T.sand}`, cursor: saved ? 'default' : 'pointer', opacity: saved ? .65 : 1 }}>
             {saved ? '✓ Saved to gallery' : 'Save to my gallery'}
+          </button>
+          <button onClick={() => cardRef.current && downloadCard(cardRef.current, `pod-access-${card.folio.replace('№ ', '')}.png`)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'transparent', border: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.12em', textTransform: 'uppercase' as const, padding: '10px 18px', borderRadius: '2px', cursor: 'pointer' }}>
+            ↓ Download
           </button>
           <button onClick={onGallery} style={{ background: 'transparent', border: 'none', color: T.sand, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase' as const, cursor: 'pointer' }}>View gallery →</button>
         </div>
