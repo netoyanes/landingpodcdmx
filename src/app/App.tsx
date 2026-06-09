@@ -2,18 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import BookingFlow from './components/BookingFlow';
 import heroImage from '../imports/image.png';
 import dinnerImage from '../imports/IMG_2842.JPG';
-import imgRectangle2 from '../imports/Artboard1-2/ddf546bc1f2cc7ddbc00d75a46dd602ebe310932.png';
-import imgRectangle3 from '../imports/Artboard1-2/6f6c82969f97fa4aca641aef0f73d9ff481b8bdc.png';
-import imgLayer2 from '../imports/Artboard1-2/52017034b5f556025947bd39ad6a8d47dc19eb13.png';
-import imgLayer3 from '../imports/Artboard1-2/3a58c355dc08dc1a0b1856a1aae9b53db1d331c9.png';
-import imgLayer4 from '../imports/Artboard1-2/ad1951afac795234f658fc4eb664d99c510aa06c.png';
-import imgLayer5 from '../imports/Artboard1-2/29ec86f0b336ff1de1f49102cf1fb93765be649c.png';
-import imgEstrella from '../imports/Artboard1-2/755d2341c16b11039427b72216e8ce890aed9d52.png';
-import imgHog from '../imports/Artboard1-2/d6e757fe4fd9c742a7d50472e5fceefc57b53510.png';
-import imgFallenGrape from '../imports/Artboard1-2/91d6cb94d1edb3dd1b6c213301df7cc47113e2b1.png';
-import imgVectorSmartObject from '../imports/Artboard1-2/2eda8c556e6be46840dc1527f7efcb692b409781.png';
-import imgAmaras from '../imports/Artboard1-2/0f7f710cb9205c333e9f7903be68951a76117ce6.png';
-import imgLayer6 from '../imports/Artboard1-2/41171619227ad67c88970294e7d53ac6bbe4d3fc.png';
 
 /* ── design tokens ─────────────────────────────────────── */
 const T = {
@@ -32,7 +20,12 @@ const T = {
 };
 
 /* ── events data ───────────────────────────────────────── */
-const EVENTS = [
+interface Event {
+  n: string; d: string; day: string; t: string; type: string; desc: string;
+  dinner?: boolean; imageUrl?: string;
+}
+
+const FALLBACK_EVENTS: Event[] = [
   { n: 'Thursday Dinner', d: 'JUN 5', day: 'THU', t: '8 PM', type: 'Dinner', dinner: true,
     desc: 'Chef Andrés Kerbel Laiter · 4-course Levantine menu with wine pairings · Live performance & DJ · 36 seats.' },
   { n: "Drink & Draw", d: 'JUN 12', day: 'FRI', t: '7 PM', type: 'Workshop',
@@ -50,6 +43,31 @@ const EVENTS = [
   { n: 'Vinyl Market', d: 'JUN 27', day: 'SAT', t: '12 PM', type: 'Music',
     desc: 'Crate-diggers market. Independent sellers, rare pressings and live selectors all day.' },
 ];
+
+/* ── Supabase event loader ─────────────────────────────── */
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+
+async function fetchSupabaseEvents(): Promise<Event[] | null> {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+  const today = new Date().toISOString().split('T')[0];
+  const url = `${SUPABASE_URL}/rest/v1/events?select=title,date_pill,day,time,type,description,image_url&is_visible=eq.true&date=gte.${today}&order=date.asc,time.asc`;
+  try {
+    const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
+    if (!res.ok) return null;
+    const rows = await res.json() as Array<{ title: string; date_pill: string; day: string; time: string; type: string; description: string; image_url: string | null }>;
+    return rows.map(r => ({
+      n: r.title,
+      d: r.date_pill || '',
+      day: (r.day || '').slice(0, 3).toUpperCase(),
+      t: r.time || '',
+      type: r.type || 'Event',
+      desc: r.description || '',
+      imageUrl: r.image_url || undefined,
+      dinner: r.type === 'Dinner',
+    }));
+  } catch { return null; }
+}
 
 /* ── access card data ──────────────────────────────────── */
 interface SavedCard {
@@ -224,9 +242,14 @@ export default function App() {
   const [topbarSolid, setTopbarSolid] = useState(false);
   const [stickyShow, setStickyShow] = useState(false);
   const [toast, setToast] = useState('');
+  const [EVENTS, setEvents] = useState<Event[]>(FALLBACK_EVENTS);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heroRef = useRef<HTMLElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchSupabaseEvents().then(evs => { if (evs && evs.length > 0) setEvents(evs); });
+  }, []);
 
   const saveCard = (card: SavedCard) => {
     setGallery(g => {
@@ -344,71 +367,23 @@ export default function App() {
 
       <main style={{ marginLeft: '62px' }}>
 
-        {/* Exhibition band */}
-        <section style={{ padding: 'clamp(64px,9vw,140px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2 }}>
-          {/* Green / Orange split */}
-          <div style={{ position: 'relative', minHeight: '60vh', overflow: 'hidden', marginBottom: 'clamp(48px,7vw,90px)' }}>
-            <div style={{ position: 'absolute', inset: 0, top: 0, height: '50%', background: '#326B3E' }}>
-              <div style={{ position: 'absolute', inset: 0, padding: '5% 8%' }}>
-                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  <img src={imgRectangle2} alt="" style={{ position: 'absolute', left: '1%', top: '8%', width: '48%', objectFit: 'contain' }} />
-                  <img src={imgRectangle3} alt="" style={{ position: 'absolute', right: '1%', top: '6%', width: '43%', objectFit: 'contain' }} />
-                  <img src={imgLayer2} alt="" style={{ position: 'absolute', left: '52%', top: '27%', width: '13%', objectFit: 'contain' }} />
-                  <img src={imgLayer3} alt="" style={{ position: 'absolute', right: '8%', top: '52%', width: '11%', objectFit: 'contain' }} />
-                  <img src={imgLayer4} alt="" style={{ position: 'absolute', left: '54%', top: '75%', width: '12%', objectFit: 'contain' }} />
-                  <img src={imgLayer5} alt="" style={{ position: 'absolute', right: '10%', top: '68%', width: '11%', objectFit: 'contain' }} />
-                </div>
+        {/* About strip */}
+        <section className="fx" style={{ padding: 'clamp(64px,9vw,120px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2, display: 'grid', gridTemplateColumns: 'minmax(160px,220px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {[['Space', 'Gallery + Community'], ['Location', 'Av. Nuevo León 108,\nHipódromo Condesa, CDMX'], ['Open', 'Tue – Sun · 11am – 8pm']].map(([label, val]) => (
+              <div key={label}>
+                <span style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '7px' }}>{label}</span>
+                <div style={{ fontFamily: T.serif, fontSize: '1.05rem', color: T.ink, lineHeight: 1.4, whiteSpace: 'pre-line' }}>{val}</div>
               </div>
-            </div>
-            <div style={{ position: 'absolute', inset: 0, top: '50%', background: '#A52B0A' }}>
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '5% 8%', textAlign: 'center' }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-                  <h1 style={{ fontFamily: T.mexcellent, fontWeight: 'normal', fontSize: 'clamp(48px,10vw,140px)', lineHeight: 1, letterSpacing: '.01em', color: '#c6c2b4', marginBottom: '16px' }}>LA PELOTA NO SE MANCHA</h1>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '24px', padding: '0 0' }}>
-                    {['ART EXHIBITION', '5 JUNE - 29 JULY'].map(t => (
-                      <div key={t} style={{ fontFamily: T.mexcellent, fontWeight: 'normal', fontSize: 'clamp(20px,3.5vw,48px)', lineHeight: 1, letterSpacing: '.01em', color: '#c6c2b4' }}>{t}</div>
-                    ))}
-                  </div>
-                  <div style={{ fontFamily: T.sans, fontSize: 'clamp(9px,0.9vw,12px)', lineHeight: 1.6, opacity: .75, color: '#c6c2b4', maxWidth: '800px', margin: '0 auto 20px' }}>
-                    <span style={{ fontWeight: 600 }}>Curated by:</span> Ezequiel Suranyi. <span style={{ fontWeight: 600 }}>Artists:</span> Alistair Woods, Carlos Herrera, Carlos Sarraf, Dani Yako, Eduardo Longoni, Ezequiel Suranyi, Giovanni de Cataldo, Grant Fleming, Hans Van der Meer, Jordi Alós, Jorge Viejo, Jürgen Rank, Malena Guerrieri, Mariana Lopez, Pablo Grinberg, Ricardo Alfieri, Zooligan.
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-                    {[imgVectorSmartObject, imgHog, imgAmaras, imgFallenGrape, imgEstrella].map((src, i) => (
-                      <img key={i} src={src} alt="" style={{ height: i === 4 ? '45px' : i === 0 ? '30px' : '35px', width: 'auto', objectFit: 'contain' }} />
-                    ))}
-                    <div style={{ fontFamily: 'Futura, Inter, sans-serif', fontWeight: 600, fontSize: 'clamp(13px,1.4vw,19px)', letterSpacing: '.12em', color: '#c6c2b4' }}>FUTBOLITIS</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div style={{ position: 'absolute', inset: 0, opacity: .24, mixBlendMode: 'plus-lighter', pointerEvents: 'none' }}>
-              <img src={imgLayer6} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
+            ))}
           </div>
-
-          {/* Exhibition meta */}
-          <div className="fx" style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,230px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start', marginBottom: 'clamp(48px,7vw,90px)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {[['Current exhibition', 'Group show'], ['Dates', 'Jun 6 — Aug 30, 2026'], ['Location', 'Av. Nuevo León 108,\nHipódromo Condesa, CDMX']].map(([label, val]) => (
-                <div key={label}>
-                  <span style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '7px' }}>{label}</span>
-                  <div style={{ fontFamily: T.serif, fontSize: '1.05rem', color: T.ink, lineHeight: 1.4, whiteSpace: 'pre-line' }}>{val}</div>
-                </div>
-              ))}
-            </div>
-            <div className="fx">
-              <p style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(1.4rem,2.6vw,2rem)', lineHeight: 1.45, color: T.ink, margin: '0 0 1.4em', maxWidth: '26ch' }}>
-                A study of texture, light and the body — staged as one continuous, sunlit room.
-              </p>
-              <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '15px', lineHeight: 1.8, color: T.inkDim, maxWidth: '54ch', margin: 0 }}>
-                POD Art House presents <em>La Pelota No Se Mancha</em>: a group exhibition where football culture meets contemporary art. Painting, photography and moving image gathered into a single sensorial environment in the heart of Condesa.
-              </p>
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const, marginTop: '26px' }}>
-                {['Painting', 'Photography', 'Moving image'].map(t => (
-                  <span key={t} style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.ink, background: 'transparent', border: `1px solid ${T.border}`, borderRadius: '40px', padding: '9px 16px' }}>{t}</span>
-                ))}
-              </div>
-            </div>
+          <div>
+            <p style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(1.4rem,2.6vw,2rem)', lineHeight: 1.45, color: T.ink, margin: '0 0 1.4em', maxWidth: '28ch' }}>
+              A space where art, food and community share the same table.
+            </p>
+            <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '15px', lineHeight: 1.8, color: T.inkDim, maxWidth: '54ch', margin: 0 }}>
+              POD Art House is a gallery, dining room and gathering place in the Hipódromo Condesa. We programme exhibitions, weekly dinners and live events — all under one roof, all with the same intention: to bring people together around what matters.
+            </p>
           </div>
         </section>
 
@@ -438,16 +413,16 @@ export default function App() {
           <div ref={stripRef} className="filmstrip">
             {EVENTS.map((ev, i) => (
               <article key={i} style={{ flex: '0 0 clamp(240px,26vw,300px)', scrollSnapAlign: 'start' }}>
-                <div style={{ position: 'relative', width: '100%', paddingBottom: '125%', overflow: 'hidden', background: ev.dinner ? 'transparent' : T.surface, border: `1px solid ${T.borderFaint}` }}>
-                  {ev.dinner ? (
-                    <img src={dinnerImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'relative', width: '100%', paddingBottom: '125%', overflow: 'hidden', background: (ev.dinner || ev.imageUrl) ? 'transparent' : T.surface, border: `1px solid ${T.borderFaint}` }}>
+                  {(ev.dinner || ev.imageUrl) ? (
+                    <img src={ev.imageUrl || dinnerImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.sand, opacity: .7 }}>{ev.type}</span>
                     </div>
                   )}
                   <span style={{ position: 'absolute', top: '12px', left: '13px', zIndex: 3, fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.14em', color: T.inkDim }}>{String(i + 1).padStart(2, '0')}</span>
-                  {ev.dinner && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(13,13,13,0.7) 0%, transparent 60%)' }} />}
+                  {(ev.dinner || ev.imageUrl) && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(13,13,13,0.7) 0%, transparent 60%)' }} />}
                 </div>
                 <div style={{ paddingTop: '16px' }}>
                   <span style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 600, fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase', color: '#0D0D0D', background: T.sand, padding: '6px 11px', borderRadius: '3px' }}>{ev.day} · {ev.d}</span>
@@ -560,8 +535,8 @@ export default function App() {
       <div style={{ position: 'fixed', left: '62px', right: 0, bottom: 0, zIndex: 38, transform: stickyShow ? 'translateY(0)' : 'translateY(110%)', transition: 'transform .5s cubic-bezier(.2,.7,.3,1)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, padding: '15px clamp(22px,5vw,72px)', background: 'rgba(13,13,13,0.9)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${T.sand}` }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
-            <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '1.25rem', color: T.ink }}>La Pelota No Se Mancha</span>
-            <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>On View — Summer 2026</span>
+            <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '1.25rem', color: T.ink }}>POD Art House</span>
+            <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>Gallery · Dining · Community · Condesa</span>
           </div>
           <a href="#events" style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.16em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', textDecoration: 'none' }}>
             Reserve access <span>→</span>
