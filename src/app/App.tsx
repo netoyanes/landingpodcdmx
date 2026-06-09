@@ -28,7 +28,7 @@ const EXHIBITION = {
 /* ── events data ───────────────────────────────────────── */
 interface Event {
   n: string; d: string; day: string; t: string; type: string; desc: string;
-  dinner?: boolean; imageUrl?: string;
+  dinner?: boolean; imageUrl?: string; airtableId?: string;
 }
 
 const FALLBACK_EVENTS: Event[] = [
@@ -57,11 +57,11 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | und
 async function fetchSupabaseEvents(): Promise<Event[] | null> {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
   const today = new Date().toISOString().split('T')[0];
-  const url = `${SUPABASE_URL}/rest/v1/events?select=title,date_pill,day,time,type,description,image_url&is_visible=eq.true&date=gte.${today}&order=date.asc,time.asc`;
+  const url = `${SUPABASE_URL}/rest/v1/events?select=id,title,date_pill,day,time,type,description,image_url&is_visible=eq.true&date=gte.${today}&order=date.asc,time.asc`;
   try {
     const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
     if (!res.ok) return null;
-    const rows = await res.json() as Array<{ title: string; date_pill: string; day: string; time: string; type: string; description: string; image_url: string | null }>;
+    const rows = await res.json() as Array<{ id: string; title: string; date_pill: string; day: string; time: string; type: string; description: string; image_url: string | null }>;
     return rows.map(r => ({
       n: r.title,
       d: r.date_pill || '',
@@ -71,6 +71,7 @@ async function fetchSupabaseEvents(): Promise<Event[] | null> {
       desc: r.description || '',
       imageUrl: r.image_url || undefined,
       dinner: r.type === 'Dinner',
+      airtableId: r.id,
     }));
   } catch { return null; }
 }
@@ -183,7 +184,7 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
     fetch('/api/rsvp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), ig: igClean, kind: target.kind, eventTitle: r.title }),
+      body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), ig: igClean, kind: target.kind, eventTitle: r.title, airtableEventId: target.kind === 'event' ? EVENTS[target.refIdx!]?.airtableId : undefined }),
     }).then(async res => {
       if (!res.ok) console.error('[RSVP]', res.status, await res.text());
       else console.log('[RSVP] saved to Airtable');

@@ -13,7 +13,7 @@ export default async function handler(req) {
     return new Response('Invalid JSON', { status: 400 });
   }
 
-  const { name, email, ig, phone, kind, eventTitle } = body;
+  const { name, email, ig, phone, kind, eventTitle, airtableEventId } = body;
   if (!name || !email) {
     return new Response(JSON.stringify({ error: 'name and email required' }), { status: 400 });
   }
@@ -29,8 +29,9 @@ export default async function handler(req) {
     'Brand/Event Name':     eventTitle || 'POD Art House',
     Notes:                  kind === 'exhibition' ? 'RSVP: Exhibition' : 'RSVP: Event',
   };
-  if (phone) fields['Phone Number'] = phone;
-  if (ig)    fields['Company/Organization/handle'] = ig;
+  if (phone)           fields['Phone Number'] = phone;
+  if (ig)              fields['Company/Organization/handle'] = ig;
+  if (airtableEventId) fields['ASANA EVENTS'] = [{ id: airtableEventId }];
 
   const res = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`, {
     method: 'POST',
