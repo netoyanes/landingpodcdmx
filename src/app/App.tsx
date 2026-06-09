@@ -19,10 +19,12 @@ const T = {
 };
 
 const EXHIBITION = {
-  title: 'Cuerpo y Materia',
+  title: 'La Pelota No Se Mancha',
   type: 'Group Exhibition',
-  tagline: 'Eight artists on texture, light and the body.',
-  dates: 'Jun 6 — Aug 30, 2026',
+  tagline: 'Football as a global cultural phenomenon.',
+  dates: 'Jun 5 — Jul 29, 2026',
+  curator: 'Curated by Ezequiel Suranyi',
+  collab: 'FUTBOLITIS × POD Art House',
 };
 
 /* ── events data ───────────────────────────────────────── */
@@ -100,7 +102,7 @@ async function downloadCard(el: HTMLElement, filename: string) {
 
 function refOf(card: SavedCard, EVENTS: Event[]) {
   if (card.kind === 'exhibition') {
-    return { title: EXHIBITION.title, type: 'Exhibition · On View', datePill: 'SUMMER 2026', time: 'On View' };
+    return { title: EXHIBITION.title, type: 'Exhibition · On View', datePill: 'JUN 5 – JUL 29', time: 'On View' };
   }
   const ev = EVENTS[card.refIdx!];
   return { title: ev.n, type: ev.type + ' · 2026', datePill: ev.day + ' · ' + ev.d, time: ev.t };
@@ -170,7 +172,7 @@ function RSVPSheet({ target, EVENTS, onClose, onSave }: {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const r = target.kind === 'exhibition'
-    ? { title: EXHIBITION.title, datePill: 'SUMMER 2026', time: 'On View', type: EXHIBITION.type }
+    ? { title: EXHIBITION.title, datePill: 'JUN 5 – JUL 29', time: 'On View', type: EXHIBITION.type }
     : (() => { const ev = EVENTS[target.refIdx!]; return { title: ev.n, datePill: ev.day + ' · ' + ev.d, time: ev.t, type: ev.type }; })();
 
   const submit = () => {
@@ -556,9 +558,9 @@ export default function App() {
         </div>
         <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.5) 38%, rgba(13,13,13,0.15) 64%, rgba(13,13,13,0.45) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '1040px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0' }}>
-          <div className="fx" style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>On View Now — Summer 2026</div>
+          <div className="fx" style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>FUTBOLITIS × POD Art House — Summer 2026</div>
           <h1 className="fx" style={{ fontFamily: T.serif, fontWeight: 300, color: T.ink, margin: '.2em 0 0', fontSize: 'clamp(3.1rem,8vw,6rem)', lineHeight: 1.0, letterSpacing: '-.02em' }}>
-            {EXHIBITION.title.split(' y ')[0]} y <span style={{ fontStyle: 'italic', fontWeight: 400 }}>{EXHIBITION.title.split(' y ')[1]}</span>
+            La Pelota <span style={{ fontStyle: 'italic', fontWeight: 400 }}>No Se Mancha</span>
           </h1>
           <p className="fx" style={{ fontFamily: T.serif, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.15rem,2.4vw,1.6rem)', color: T.ink, opacity: .86, maxWidth: '30ch', margin: '.55em 0 2em' }}>{EXHIBITION.tagline}</p>
           <div className="fx" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
@@ -580,7 +582,7 @@ export default function App() {
         <section id="exhibition" style={{ padding: 'clamp(64px,9vw,140px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2 }}>
           <div className="exhibit-grid fx" style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,230px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {[['Current exhibition', 'Group show'], ['Dates', EXHIBITION.dates], ['Location', 'Av. Nuevo León 108,\nHipódromo Condesa, CDMX']].map(([label, val]) => (
+              {[['Current exhibition', 'FUTBOLITIS × POD Art House'], ['Curated by', 'Ezequiel Suranyi'], ['Dates', EXHIBITION.dates], ['Location', 'Av. Nuevo León 108,\nColonia Condesa, CDMX']].map(([label, val]) => (
                 <div key={label}>
                   <span style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '7px' }}>{label}</span>
                   <div style={{ fontFamily: T.serif, fontSize: label === 'Current exhibition' ? '1.25rem' : '1.02rem', color: T.ink, lineHeight: 1.4, whiteSpace: 'pre-line' }}>{val}</div>
@@ -589,13 +591,13 @@ export default function App() {
             </div>
             <div className="fx">
               <p style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(1.4rem,2.6vw,2rem)', lineHeight: 1.45, color: T.ink, margin: '0 0 1.4em', maxWidth: '26ch', letterSpacing: '.002em' }}>
-                A study of texture, light and the body — staged as one continuous, sunlit room to move through slowly.
+                To mark Mexico's historic third hosting of the FIFA World Cup — football as a global cultural phenomenon.
               </p>
               <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '15px', lineHeight: 1.8, color: T.inkDim, maxWidth: '54ch', margin: 0 }}>
-                POD Art House presents <em>{EXHIBITION.title}</em>: eight artists working across painting, ceramics and moving image, gathered into a single sensorial environment in the heart of Condesa. The show is built less as a wall of objects than as an atmosphere — material, warm and unhurried.
+                Buenos Aires-based art project FUTBOLITIS joins forces with POD Art House to present <em>La Pelota No Se Mancha</em> — an international group exhibition bringing together painting, photography, video and installation spanning contemporary and vintage work. 18 artists from Argentina, Mexico, Italy, the United Kingdom, Germany, the Netherlands and France, including Alistair Woods, Eduardo Longoni, Giovanni de Cataldo, Grant Fleming, Hans van der Meer, Jürgen Rank, Pablo Grinberg and Zooligan, among others.
               </p>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const, marginTop: '26px' }}>
-                {['Painting', 'Ceramics', 'Moving image'].map(t => (
+                {['Painting', 'Photography', 'Video', 'Installation'].map(t => (
                   <span key={t} style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.ink, background: 'transparent', border: `1px solid ${T.border}`, borderRadius: '40px', padding: '9px 16px' }}>{t}</span>
                 ))}
               </div>
@@ -674,7 +676,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, padding: '15px clamp(22px,5vw,72px)', background: 'rgba(13,13,13,0.9)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${T.sand}` }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
             <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '1.25rem', color: T.ink }}>{EXHIBITION.title}</span>
-            <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>On View — Summer 2026</span>
+            <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>FUTBOLITIS × POD — Jun 5 – Jul 29</span>
           </div>
           <button onClick={() => setRsvpTarget({ kind: 'exhibition' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.16em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
             Reserve access <span>→</span>
