@@ -1,7 +1,1 @@
-{
-  "functions": {
-    "api/webhook/airtable.js": {
-      "runtime": "edge"
-    }
-  }
-}
+{}
