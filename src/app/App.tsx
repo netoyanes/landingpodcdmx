@@ -314,7 +314,7 @@ function EventCard({ ev, idx, reserved, onRSVP }: { ev: Event; idx: number; rese
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ position: 'relative', width: '100%', paddingBottom: '125%', overflow: 'hidden', background: T.surface, border: `1px solid ${T.borderFaint}`, borderRadius: '2px' }}>
+      <div onClick={onRSVP} style={{ position: 'relative', width: '100%', paddingBottom: '125%', overflow: 'hidden', background: T.surface, border: `1px solid ${T.borderFaint}`, borderRadius: '2px', cursor: 'pointer' }}>
         {imgSrc
           ? <img src={imgSrc} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .5s cubic-bezier(.2,.7,.3,1)', transform: hovered ? 'scale(1.04)' : 'scale(1)' }} />
           : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -322,6 +322,7 @@ function EventCard({ ev, idx, reserved, onRSVP }: { ev: Event; idx: number; rese
             </div>
         }
         <span style={{ position: 'absolute', top: '12px', left: '13px', zIndex: 3, fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.14em', color: T.inkDim }}>{String(idx + 1).padStart(2, '0')}</span>
+        {!reserved && <span style={{ position: 'absolute', inset: 0, zIndex: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: hovered ? 1 : 0, transition: 'opacity .3s ease', background: 'rgba(13,13,13,0.45)' }}><span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.22em', textTransform: 'uppercase' as const, color: T.sand, border: `1px solid ${T.sand}`, padding: '10px 20px', borderRadius: '2px' }}>RSVP →</span></span>}
       </div>
       <div style={{ paddingTop: '16px' }}>
         <span style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 600, fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase' as const, color: '#0D0D0D', background: T.sand, padding: '6px 11px', borderRadius: '3px' }}>{ev.day} · {ev.d}</span>
@@ -428,8 +429,8 @@ export default function App() {
           .wrap { margin-left:0 !important; }
           .hero-section { padding-left:24px !important; padding-right:24px !important; padding-bottom:48px !important; }
           .hero-section .hero-content { padding-left:0 !important; }
-          .filmstrip { flex-direction:column; overflow:visible; gap:0; scroll-snap-type:none; padding-bottom:0; }
-          .filmstrip article { flex:0 0 auto !important; width:100% !important; padding-bottom:32px; }
+          .filmstrip { padding-bottom:20px; }
+          .filmstrip article { flex:0 0 80vw !important; }
           .exhibit-grid { grid-template-columns:1fr !important; }
           .rsvp-grid-inner { grid-template-columns:1fr !important; }
           .topbar-el { padding-left:24px !important; padding-right:24px !important; }
