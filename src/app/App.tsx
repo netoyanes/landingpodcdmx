@@ -303,90 +303,6 @@ function GallerySheet({ gallery, EVENTS, onClose, onRemove }: { gallery: SavedCa
   );
 }
 
-/* ── InlineRSVP ────────────────────────────────────────── */
-function InlineRSVP({ EVENTS, onSave, onGallery }: { EVENTS: Event[]; onSave: (card: SavedCard) => void; onGallery: () => void }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [ig, setIg] = useState('');
-  const [errors, setErrors] = useState({ name: false, email: false });
-  const [card, setCard] = useState<SavedCard | null>(null);
-  const [saved, setSaved] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const submit = () => {
-    const nameOk = name.trim().length > 0;
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-    setErrors({ name: !nameOk, email: !emailOk });
-    if (!nameOk || !emailOk) return;
-    const igClean = ig.trim() ? (ig[0] === '@' ? ig.trim() : '@' + ig.trim()) : '';
-    setCard({ id: Date.now(), folio: genFolio(), name: name.trim(), email: email.trim(), ig: igClean, kind: 'exhibition' });
-    fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), ig: igClean, kind: 'exhibition', eventTitle: EXHIBITION.title }),
-    }).then(async res => {
-      if (!res.ok) console.error('[RSVP]', res.status, await res.text());
-      else console.log('[RSVP] saved to Airtable');
-    }).catch(err => console.error('[RSVP] fetch failed', err));
-  };
-
-  if (card) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-start', gap: '22px' }}>
-        <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.24em', textTransform: 'uppercase' as const, color: T.sand }}>Your access card</div>
-        <AccessPass ref={cardRef} card={card} EVENTS={EVENTS} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' as const }}>
-          <button onClick={() => { if (!saved) { onSave(card); setSaved(true); } }}
-            disabled={saved}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase' as const, padding: '14px 26px', borderRadius: '2px', color: '#0D0D0D', background: saved ? T.inkFaint : T.sand, border: `1px solid ${saved ? T.inkFaint : T.sand}`, cursor: saved ? 'default' : 'pointer', opacity: saved ? .65 : 1 }}>
-            {saved ? '✓ Saved to gallery' : 'Save to my gallery'}
-          </button>
-          <button onClick={() => cardRef.current && downloadCard(cardRef.current, `pod-access-${card.folio.replace('№ ', '')}.png`)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'transparent', border: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.12em', textTransform: 'uppercase' as const, padding: '10px 18px', borderRadius: '2px', cursor: 'pointer' }}>
-            ↓ Download
-          </button>
-          <button onClick={onGallery} style={{ background: 'transparent', border: 'none', color: T.sand, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase' as const, cursor: 'pointer' }}>View gallery →</button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ maxWidth: '640px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '22px 28px' }}>
-        {[
-          { label: 'First name', val: name, set: setName, err: errors.name, msg: 'Please add your name.', ph: 'Your name', type: 'text' },
-          { label: 'Email', val: email, set: setEmail, err: errors.email, msg: 'Add a valid email.', ph: 'you@email.com', type: 'email' },
-        ].map(f => (
-          <div key={f.label} style={{ position: 'relative' }}>
-            <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>{f.label}</label>
-            <input type={f.type} value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph}
-              style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${f.err ? '#c47a63' : T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
-            {f.err && <div style={{ fontSize: '10px', color: '#c47a63', marginTop: '5px' }}>{f.msg}</div>}
-          </div>
-        ))}
-        <div>
-          <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>Phone <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
-          <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+52 55 0000 0000"
-            style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
-        </div>
-        <div>
-          <label style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: T.inkFaint, marginBottom: '9px' }}>Instagram <em style={{ fontStyle: 'normal', textTransform: 'none', letterSpacing: 0, color: T.inkFaint }}>(optional)</em></label>
-          <input value={ig} onChange={e => setIg(e.target.value)} placeholder="@handle"
-            style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${T.border}`, color: T.ink, fontFamily: T.sans, fontSize: '15px', fontWeight: 300, padding: '8px 0', outline: 'none' }} />
-        </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, marginTop: '34px' }}>
-        <span style={{ fontFamily: T.sans, fontSize: '11px', letterSpacing: '.1em', textTransform: 'uppercase' as const, color: T.inkFaint }}>Limited capacity · Curated guest list</span>
-        <button onClick={submit} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase' as const, padding: '14px 26px', borderRadius: '2px', color: '#0D0D0D', background: T.sand, border: `1px solid ${T.sand}`, cursor: 'pointer' }}>
-          Reserve access <span>→</span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ── EventCard ─────────────────────────────────────────── */
 function EventCard({ ev, idx, reserved, onRSVP }: { ev: Event; idx: number; reserved: boolean; onRSVP: () => void }) {
   const [hovered, setHovered] = useState(false);
@@ -546,8 +462,8 @@ export default function App() {
               {gallery.length}
             </span>
           </button>
-          <button onClick={() => setRsvpTarget({ kind: 'exhibition' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
-            Request access <span>→</span>
+          <button onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
+            What's on <span>→</span>
           </button>
         </nav>
       </header>
@@ -565,8 +481,8 @@ export default function App() {
           </h1>
           <p className="fx" style={{ fontFamily: T.serif, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.15rem,2.4vw,1.6rem)', color: T.ink, opacity: .86, maxWidth: '30ch', margin: '.55em 0 2em' }}>{EXHIBITION.tagline}</p>
           <div className="fx" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-            <button onClick={() => setRsvpTarget({ kind: 'exhibition' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '14px 26px', borderRadius: '2px', color: T.sand, border: `1px solid ${T.sand}`, background: 'transparent', cursor: 'pointer' }}>
-              Reserve your spot <span>→</span>
+            <button onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '14px 26px', borderRadius: '2px', color: T.sand, border: `1px solid ${T.sand}`, background: 'transparent', cursor: 'pointer' }}>
+              See what's on <span>→</span>
             </button>
             <span style={{ display: 'inline-flex', gap: '10px', alignItems: 'center', color: T.inkDim, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase' }}>{EXHIBITION.dates}</span>
           </div>
@@ -601,19 +517,6 @@ export default function App() {
                 {['Painting', 'Photography', 'Video', 'Installation'].map(t => (
                   <span key={t} style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.ink, background: 'transparent', border: `1px solid ${T.border}`, borderRadius: '40px', padding: '9px 16px' }}>{t}</span>
                 ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Inline RSVP */}
-          <div style={{ borderTop: `1px solid ${T.borderFaint}`, marginTop: 'clamp(48px,7vw,90px)', paddingTop: 'clamp(40px,6vw,70px)' }}>
-            <div className="exhibit-grid fx" style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,230px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start' }}>
-              <div>
-                <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>Reserve access</span>
-                <div style={{ fontFamily: T.serif, fontSize: '1.02rem', color: T.inkDim, lineHeight: 1.5, marginTop: '10px' }}>Join the guest list.</div>
-              </div>
-              <div className="fx">
-                <InlineRSVP EVENTS={EVENTS} onSave={saveCard} onGallery={() => setGalleryOpen(true)} />
               </div>
             </div>
           </div>
@@ -682,8 +585,8 @@ export default function App() {
             <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '1.25rem', color: T.ink }}>{EXHIBITION.title}</span>
             <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>FUTBOLITIS × POD — Jun 5 – Jul 29</span>
           </div>
-          <button onClick={() => setRsvpTarget({ kind: 'exhibition' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.16em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
-            Reserve access <span>→</span>
+          <button onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.16em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
+            See what's on <span>→</span>
           </button>
         </div>
       </div>
