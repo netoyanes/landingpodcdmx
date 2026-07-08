@@ -28,6 +28,23 @@ const EXHIBITION = {
   collab: 'FUTBOLITIS × POD Art House',
 };
 
+/* ── page theme (new POD Condesa layout) ───────────────── */
+const P = {
+  cream: '#EFEFE0',       // primary bg (nav, about, this-week)
+  cream2: '#F5F5EC',      // lighter cream (statement, CTA strips)
+  ink: '#0D0D0D',         // near-black (dark sections + text on cream)
+  ink2: '#252525',
+  taupe: '#B3B3A8',       // muted body text on dark
+  poppins: "'Poppins', -apple-system, sans-serif",
+  plex: "'IBM Plex Sans', -apple-system, sans-serif",
+};
+
+const COMING_SOON = [
+  { type: 'Exhibition', title: 'Gabriel Orozco: Public Nature', dates: '2 Jul — 2 Aug' },
+  { type: 'Exhibition', title: 'Gabriel Orozco: Public Nature', dates: '2 Jul — 2 Aug' },
+  { type: 'Exhibition', title: 'Gabriel Orozco: Public Nature', dates: '2 Jul — 2 Aug' },
+];
+
 /* ── events data ───────────────────────────────────────── */
 interface Event {
   n: string; d: string; day: string; t: string; type: string; desc: string;
@@ -303,57 +320,56 @@ function GallerySheet({ gallery, EVENTS, onClose, onRemove }: { gallery: SavedCa
   );
 }
 
-/* ── EventCard ─────────────────────────────────────────── */
-function EventCard({ ev, idx, reserved, onRSVP }: { ev: Event; idx: number; reserved: boolean; onRSVP: () => void }) {
+/* ── EventRow (This Week at POD list) ──────────────────── */
+function EventRow({ ev, reserved, onRSVP }: { ev: Event; reserved: boolean; onRSVP: () => void }) {
   const [hovered, setHovered] = useState(false);
   const imgSrc = ev.imageUrl || (ev.dinner ? dinnerImage : null);
 
   return (
     <article
-      style={{ flex: '0 0 clamp(240px,26vw,300px)', scrollSnapAlign: 'start' }}
+      className="event-row"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      style={{ display: 'flex', alignItems: 'center', gap: 'clamp(16px,2vw,26px)', width: '100%', paddingBottom: 'clamp(20px,2.4vw,28px)', borderBottom: `1px solid rgba(13,13,13,0.12)` }}
     >
-      <div onClick={onRSVP} style={{ position: 'relative', width: '100%', paddingBottom: '125%', overflow: 'hidden', background: T.surface, border: `1px solid ${T.borderFaint}`, borderRadius: '2px', cursor: 'pointer' }}>
+      <div onClick={onRSVP} className="event-row-img" style={{ position: 'relative', flexShrink: 0, width: 'clamp(120px,14vw,186px)', height: 'clamp(120px,14vw,186px)', overflow: 'hidden', background: P.ink, cursor: 'pointer' }}>
         {imgSrc
-          ? <img src={imgSrc} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .5s cubic-bezier(.2,.7,.3,1)', transform: hovered ? 'scale(1.04)' : 'scale(1)' }} />
+          ? <img src={imgSrc} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .5s cubic-bezier(.2,.7,.3,1)', transform: hovered ? 'scale(1.05)' : 'scale(1)' }} />
           : <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.2em', textTransform: 'uppercase' as const, color: T.sand, opacity: .7 }}>{ev.type}</span>
+              <span style={{ fontFamily: P.plex, fontWeight: 400, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase' as const, color: P.taupe }}>{ev.type}</span>
             </div>
         }
-        <span style={{ position: 'absolute', top: '12px', left: '13px', zIndex: 3, fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.14em', color: T.inkDim }}>{String(idx + 1).padStart(2, '0')}</span>
-        {!reserved && <span style={{ position: 'absolute', inset: 0, zIndex: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: hovered ? 1 : 0, transition: 'opacity .3s ease', background: 'rgba(13,13,13,0.45)' }}><span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.22em', textTransform: 'uppercase' as const, color: T.sand, border: `1px solid ${T.sand}`, padding: '10px 20px', borderRadius: '2px' }}>RSVP →</span></span>}
+        {!reserved && <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: hovered ? 1 : 0, transition: 'opacity .3s ease', background: 'rgba(13,13,13,0.5)' }}><span style={{ fontFamily: P.plex, fontWeight: 500, fontSize: '12px', letterSpacing: '.18em', textTransform: 'uppercase' as const, color: P.cream, border: `1px solid ${P.cream}`, padding: '8px 16px' }}>RSVP</span></span>}
       </div>
-      <div style={{ paddingTop: '16px' }}>
-        <span style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 600, fontSize: '10px', letterSpacing: '.12em', textTransform: 'uppercase' as const, color: '#0D0D0D', background: T.sand, padding: '6px 11px', borderRadius: '3px' }}>{ev.day} · {ev.d}</span>
-        <h3 style={{ fontFamily: T.serif, fontWeight: 500, fontSize: '1.4rem', lineHeight: 1.12, color: hovered ? T.sand : T.ink, margin: '13px 0 8px', transition: 'color .3s ease' }}>{ev.n}</h3>
-        <div style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.18em', textTransform: 'uppercase' as const, color: T.inkFaint }}>{ev.type}</div>
-        <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '13px', lineHeight: 1.65, color: T.inkDim, margin: '12px 0 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{ev.desc}</p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px', paddingTop: '14px', borderTop: `1px solid ${T.borderFaint}` }}>
-          <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '12px', letterSpacing: '.08em', color: T.sand }}>{ev.t}</span>
-          <button onClick={onRSVP} style={{ background: 'transparent', border: 'none', color: reserved ? T.inkFaint : T.sand, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.14em', textTransform: 'uppercase' as const, display: 'inline-flex', alignItems: 'center', gap: '7px', cursor: 'pointer' }}>
-            {reserved ? 'Reserved ✓' : <><span>RSVP</span><span style={{ transition: 'transform .3s ease', transform: hovered ? 'translateX(4px)' : 'none' }}>→</span></>}
-          </button>
-        </div>
+
+      <div className="event-row-date" style={{ flexShrink: 0, width: 'clamp(120px,14vw,200px)', textAlign: 'center' as const, fontFamily: P.plex, textTransform: 'uppercase' as const, color: P.ink, letterSpacing: '.1em' }}>
+        <div style={{ fontWeight: 500, fontSize: 'clamp(16px,1.6vw,22px)' }}>{ev.d || (ev.day + ' ' + ev.d)}</div>
+        <div style={{ fontWeight: 300, fontSize: 'clamp(13px,1.2vw,17px)', marginTop: '4px', color: P.ink2 }}>{ev.t}</div>
       </div>
+
+      <div className="event-row-body" style={{ flex: 1, minWidth: 0, color: P.ink, textTransform: 'uppercase' as const }}>
+        <div style={{ fontFamily: P.poppins, fontWeight: 400, fontSize: 'clamp(13px,1.2vw,18px)', letterSpacing: '.1em', color: P.ink2 }}>{ev.type}</div>
+        <div style={{ fontFamily: P.poppins, fontWeight: 700, fontSize: 'clamp(20px,2.4vw,30px)', letterSpacing: '.06em', lineHeight: 1.1, marginTop: '6px', color: hovered ? P.ink2 : P.ink, transition: 'color .3s ease' }}>{ev.n}</div>
+      </div>
+
+      <button onClick={onRSVP} className="event-row-rsvp" style={{ flexShrink: 0, background: 'transparent', border: reserved ? '1px solid rgba(13,13,13,0.25)' : `1px solid ${P.ink}`, color: P.ink, fontFamily: P.plex, fontWeight: 500, fontSize: 'clamp(14px,1.4vw,20px)', letterSpacing: '.12em', textTransform: 'uppercase' as const, padding: 'clamp(10px,1.1vw,15px) clamp(20px,2.4vw,40px)', cursor: reserved ? 'default' : 'pointer', opacity: reserved ? .5 : 1, transition: 'background .25s ease, color .25s ease', ...(hovered && !reserved ? { background: P.ink, color: P.cream } : {}) }}>
+        {reserved ? 'Reserved' : 'RSVP'}
+      </button>
     </article>
   );
 }
 
-/* ── main App ──────────────────────────────────────────── */
+
+/* ── main App (POD Condesa layout) ─────────────────────── */
 export default function App() {
   const [rsvpTarget, setRsvpTarget] = useState<{ kind: 'exhibition' | 'event'; refIdx?: number } | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [gallery, setGallery] = useState<SavedCard[]>(() => {
     try { return JSON.parse(localStorage.getItem('pod_gallery') || '[]'); } catch { return []; }
   });
-  const [topbarSolid, setTopbarSolid] = useState(false);
-  const [stickyShow, setStickyShow] = useState(false);
   const [toast, setToast] = useState('');
   const [EVENTS, setEvents] = useState<Event[]>(FALLBACK_EVENTS);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const heroRef = useRef<HTMLElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchSupabaseEvents().then(evs => { if (evs && evs.length > 0) setEvents(evs); });
@@ -384,215 +400,176 @@ export default function App() {
   };
 
   useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const io = new IntersectionObserver(([e]) => {
-      const gone = !e.isIntersecting;
-      setTopbarSolid(gone);
-      setStickyShow(gone);
-    }, { rootMargin: '-65% 0px 0px 0px' });
-    io.observe(hero);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
     const els = document.querySelectorAll('.fx');
     const io = new IntersectionObserver((entries) => {
       entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
     }, { threshold: 0.12 });
     els.forEach(el => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [EVENTS]);
 
   const isReserved = (idx: number) => gallery.some(c => c.kind === 'event' && c.refIdx === idx);
   const overlayOpen = rsvpTarget !== null || galleryOpen;
 
+  const PAD = 'clamp(24px,6vw,102px)';
+  const navLink = { fontFamily: P.poppins, fontWeight: 300, fontSize: 'clamp(12px,1vw,15px)', letterSpacing: '.12em', textTransform: 'uppercase' as const, color: P.ink, background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'none' };
+  const sectionHeading = { fontFamily: P.poppins, fontWeight: 600, fontSize: 'clamp(28px,4.4vw,40px)', letterSpacing: '.06em', textTransform: 'uppercase' as const, margin: 0 };
+
+  const goto = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+
   return (
-    <div style={{ background: T.bg, color: T.ink, fontFamily: T.sans, fontWeight: 300, lineHeight: 1.6, minHeight: '100vh', overflowX: 'hidden' }}>
+    <div style={{ background: P.cream, color: P.ink, fontFamily: P.plex, lineHeight: 1.6, minHeight: '100vh', overflowX: 'hidden' }}>
       <style>{`
         @keyframes sheetin { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
-        @keyframes cue { 0%,100%{ transform:scaleX(.3); opacity:.4; } 50%{ transform:scaleX(1); opacity:1; } }
+        * { box-sizing:border-box; }
+        ::selection { background:${P.ink}; color:${P.cream}; }
         @media (prefers-reduced-motion: no-preference) {
           .fx { opacity:0; transform:translateY(20px); }
           .fx.in { opacity:1; transform:none; transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.3,1); }
         }
-        * { box-sizing:border-box; }
-        ::selection { background:${T.sand}; color:#0D0D0D; }
-        input { background:transparent; border:none; border-bottom:1px solid ${T.border}; color:${T.ink}; font-family:${T.sans}; font-size:15px; font-weight:300; padding:8px 0; outline:none; width:100%; }
-        input::placeholder { color:${T.inkFaint}; }
-        input:focus { border-bottom-color:${T.sand}; }
-        .filmstrip { display:flex; gap:clamp(20px,2.4vw,34px); overflow-x:auto; padding-bottom:14px; scroll-snap-type:x mandatory; scrollbar-width:thin; scrollbar-color:${T.border} transparent; }
-        .filmstrip::-webkit-scrollbar { height:5px; }
-        .filmstrip::-webkit-scrollbar-thumb { background:${T.border}; border-radius:40px; }
-        @media (max-width:767px) {
-          .rail-el { display:none !important; }
-          .wrap { margin-left:0 !important; }
-          .hero-section { padding-left:24px !important; padding-right:24px !important; padding-bottom:48px !important; }
-          .hero-section .hero-content { padding-left:0 !important; }
-          .filmstrip { padding-bottom:20px; }
-          .filmstrip article { flex:0 0 80vw !important; }
-          .exhibit-grid { grid-template-columns:1fr !important; }
-          .rsvp-grid-inner { grid-template-columns:1fr !important; }
-          .topbar-el { padding-left:24px !important; padding-right:24px !important; }
-        }
-        @media (max-width:1023px) {
-          .rail-el { display:none !important; }
-          .wrap { margin-left:0 !important; }
-          .sticky-bar-el { left:0 !important; }
+        .nav-links { display:flex; align-items:center; gap:clamp(20px,3vw,52px); }
+        .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,6vw,96px); align-items:start; }
+        .exh-grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,5vw,80px); align-items:center; }
+        .soon-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(20px,2.4vw,34px); }
+        @media (max-width:860px) {
+          .nav-links { gap:16px; }
+          .nav-links .nav-hide { display:none; }
+          .about-grid, .exh-grid, .soon-grid { grid-template-columns:1fr; }
+          .exh-image { order:-1; }
+          .event-row { flex-wrap:wrap; gap:16px; }
+          .event-row-date { width:auto !important; text-align:left !important; }
+          .event-row-body { flex:1 1 100% !important; order:3; }
+          .event-row-rsvp { margin-left:auto; }
         }
       `}</style>
 
-      {/* Film grain */}
-      <div aria-hidden="true" style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', opacity: .05, mixBlendMode: 'overlay' as const,
-        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
-
-      {/* Index rail */}
-      <aside className="rail-el" aria-hidden="true" style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: '62px', zIndex: 40, borderRight: `1px solid ${T.borderFaint}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '18px 0', background: 'rgba(13,13,13,0.4)', backdropFilter: 'blur(6px)' }}>
-        <div style={{ fontFamily: T.sans, fontSize: '10px', letterSpacing: '.12em', color: T.inkFaint }}>№ 001</div>
-        <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontFamily: T.sans, fontWeight: 500, fontSize: '10px', letterSpacing: '.34em', textTransform: 'uppercase', color: T.inkDim }}>Hipódromo Condesa · CDMX</div>
-        <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: T.sand }} />
-      </aside>
-
-      {/* Top bar */}
-      <header className="topbar-el" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 45, height: topbarSolid ? '60px' : '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 'calc(62px + clamp(22px,5vw,72px))', paddingRight: 'clamp(22px,5vw,72px)', transition: 'background .4s ease, height .3s ease', background: topbarSolid ? 'rgba(13,13,13,0.82)' : 'transparent', backdropFilter: topbarSolid ? 'blur(12px)' : 'none', borderBottom: topbarSolid ? `1px solid ${T.borderFaint}` : '1px solid transparent' }}>
-        <div style={{ fontFamily: T.sans, fontWeight: 600, fontSize: '13px', letterSpacing: '.26em', textTransform: 'uppercase', color: T.ink }}>POD Art House</div>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
-          <button onClick={() => setGalleryOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '9px', background: 'transparent', border: 'none', color: T.ink, fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase', cursor: 'pointer' }}>
+      {/* Nav */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: P.cream, height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `0 ${PAD}`, borderBottom: `1px solid rgba(13,13,13,0.08)` }}>
+        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ fontFamily: P.poppins, fontWeight: 600, fontSize: 'clamp(16px,1.8vw,24px)', letterSpacing: '.08em', textTransform: 'uppercase', color: P.ink, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>POD Condesa</button>
+        <nav className="nav-links">
+          <button className="nav-hide" style={navLink} onClick={() => goto('exhibition')}>Exhibitions</button>
+          <button className="nav-hide" style={navLink} onClick={() => goto('events')}>Events</button>
+          <button className="nav-hide" style={navLink} onClick={() => goto('contact')}>Contact us</button>
+          <button onClick={() => setGalleryOpen(true)} style={{ ...navLink, display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             My Gallery
-            <span style={{ minWidth: '20px', height: '20px', padding: '0 6px', borderRadius: '40px', background: gallery.length > 0 ? T.sand : 'transparent', color: gallery.length > 0 ? '#0D0D0D' : T.inkFaint, border: gallery.length > 0 ? 'none' : `1px solid ${T.border}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '10px' }}>
-              {gallery.length}
-            </span>
-          </button>
-          <button onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
-            What's on <span>→</span>
+            <span style={{ minWidth: '20px', height: '20px', padding: '0 6px', borderRadius: '40px', background: gallery.length > 0 ? P.ink : 'transparent', color: gallery.length > 0 ? P.cream : P.ink, border: gallery.length > 0 ? 'none' : `1px solid rgba(13,13,13,0.3)`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '11px' }}>{gallery.length}</span>
           </button>
         </nav>
       </header>
 
       {/* Hero */}
-      <section ref={heroRef} className="hero-section" style={{ position: 'relative', minHeight: '100svh', display: 'flex', alignItems: 'flex-end', paddingBottom: 'clamp(56px,8vh,100px)', paddingLeft: 'calc(62px + clamp(22px,5vw,72px))', paddingRight: 'clamp(22px,5vw,72px)', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <img src={heroImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-        </div>
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'linear-gradient(to top, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.5) 38%, rgba(13,13,13,0.15) 64%, rgba(13,13,13,0.45) 100%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1040px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0' }}>
-          <div className="fx" style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>FUTBOLITIS × POD Art House — Summer 2026</div>
-          <h1 className="fx" style={{ fontFamily: T.serif, fontWeight: 300, color: T.ink, margin: '.2em 0 0', fontSize: 'clamp(3.1rem,8vw,6rem)', lineHeight: 1.0, letterSpacing: '-.02em' }}>
-            La Pelota <span style={{ fontStyle: 'italic', fontWeight: 400 }}>No Se Mancha</span>
-          </h1>
-          <p className="fx" style={{ fontFamily: T.serif, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.15rem,2.4vw,1.6rem)', color: T.ink, opacity: .86, maxWidth: '30ch', margin: '.55em 0 2em' }}>{EXHIBITION.tagline}</p>
-          <div className="fx" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-            <button onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '11.5px', letterSpacing: '.18em', textTransform: 'uppercase', padding: '14px 26px', borderRadius: '2px', color: T.sand, border: `1px solid ${T.sand}`, background: 'transparent', cursor: 'pointer' }}>
-              See what's on <span>→</span>
-            </button>
-            <span style={{ display: 'inline-flex', gap: '10px', alignItems: 'center', color: T.inkDim, fontSize: '11px', letterSpacing: '.16em', textTransform: 'uppercase' }}>{EXHIBITION.dates}</span>
+      <section style={{ position: 'relative', width: '100%', height: 'clamp(360px,62vh,680px)', overflow: 'hidden', background: P.ink }}>
+        <img src={heroImage} alt="POD Condesa gallery" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '212px', background: `linear-gradient(to top, ${P.cream} 0%, rgba(239,239,224,0) 100%)`, pointerEvents: 'none' }} />
+      </section>
+
+      {/* About */}
+      <section style={{ background: P.cream, padding: `clamp(48px,7vw,90px) ${PAD}` }}>
+        <div className="about-grid fx">
+          <div>
+            <div style={{ fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(16px,1.6vw,22px)', letterSpacing: '.04em', textTransform: 'uppercase', color: P.ink }}>[about]</div>
+            <h1 style={{ fontFamily: P.poppins, fontWeight: 600, fontSize: 'clamp(38px,6vw,56px)', letterSpacing: '.07em', textTransform: 'uppercase', color: P.ink, margin: '8px 0 0', lineHeight: 1.05 }}>POD Condesa</h1>
           </div>
-        </div>
-        <div aria-hidden="true" style={{ position: 'absolute', left: 'calc(62px + clamp(22px,5vw,72px))', bottom: '26px', zIndex: 2, display: 'flex', alignItems: 'center', gap: '10px', color: T.inkFaint, fontSize: '10px', letterSpacing: '.22em', textTransform: 'uppercase' }}>
-          <span style={{ width: '46px', height: '1px', background: T.sand, transformOrigin: 'left', animation: 'cue 2.6s ease-in-out infinite' }} />
-          Scroll
+          <div>
+            <p style={{ fontFamily: P.plex, fontWeight: 400, fontSize: 'clamp(16px,1.5vw,20px)', lineHeight: 1.7, color: P.ink, margin: 0 }}>
+              POD Condesa is an art house in the heart of Colonia Condesa — a space where exhibitions, live music, workshops and community gather under one roof. We program art as a way of connecting people, ideas and the neighbourhood.
+            </p>
+            <div style={{ display: 'flex', gap: '24px', marginTop: '28px' }}>
+              {['Art House', 'Community'].map(t => (
+                <span key={t} style={{ fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(15px,1.4vw,20px)', letterSpacing: '.02em', color: P.ink, textDecoration: 'underline', textUnderlineOffset: '4px' }}>{t}</span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <main className="wrap" style={{ marginLeft: '62px' }}>
-
-        {/* Exhibition band */}
-        <section id="exhibition" style={{ padding: 'clamp(64px,9vw,140px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2 }}>
-          <div className="exhibit-grid fx" style={{ display: 'grid', gridTemplateColumns: 'minmax(180px,230px) 1fr', gap: 'clamp(28px,5vw,80px)', alignItems: 'start' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {[['Current exhibition', 'FUTBOLITIS × POD Art House'], ['Curated by', 'Ezequiel Suranyi'], ['Dates', EXHIBITION.dates], ['Location', 'Av. Nuevo León 108,\nColonia Condesa, CDMX']].map(([label, val]) => (
-                <div key={label}>
-                  <span style={{ display: 'block', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint, marginBottom: '7px' }}>{label}</span>
-                  <div style={{ fontFamily: T.serif, fontSize: label === 'Current exhibition' ? '1.25rem' : '1.02rem', color: T.ink, lineHeight: 1.4, whiteSpace: 'pre-line' }}>{val}</div>
-                </div>
-              ))}
+      {/* Current exhibition (dark) */}
+      <section id="exhibition" style={{ background: P.ink, color: P.cream, padding: `clamp(56px,8vw,110px) ${PAD}` }}>
+        <div className="exh-grid fx">
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(12px,1.1vw,16px)', letterSpacing: '.1em', textTransform: 'uppercase', color: P.cream }}>
+              <span>[Current exhibition]</span>
+              <span>{EXHIBITION.dates}</span>
             </div>
-            <div className="fx">
-              <p style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(1.4rem,2.6vw,2rem)', lineHeight: 1.45, color: T.ink, margin: '0 0 1.4em', maxWidth: '26ch', letterSpacing: '.002em' }}>
-                To mark Mexico's historic third hosting of the FIFA World Cup — football as a global cultural phenomenon.
-              </p>
-              <p style={{ fontFamily: T.sans, fontWeight: 300, fontSize: '15px', lineHeight: 1.8, color: T.inkDim, maxWidth: '54ch', margin: 0 }}>
-                Buenos Aires-based art project FUTBOLITIS joins forces with POD Art House to present <em>La Pelota No Se Mancha</em> — an international group exhibition bringing together painting, photography, video and installation spanning contemporary and vintage work. 18 artists from Argentina, Mexico, Italy, the United Kingdom, Germany, the Netherlands and France, including Alistair Woods, Eduardo Longoni, Giovanni de Cataldo, Grant Fleming, Hans van der Meer, Jürgen Rank, Pablo Grinberg and Zooligan, among others.
-              </p>
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const, marginTop: '26px' }}>
-                {['Painting', 'Photography', 'Video', 'Installation'].map(t => (
-                  <span key={t} style={{ display: 'inline-flex', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.ink, background: 'transparent', border: `1px solid ${T.border}`, borderRadius: '40px', padding: '9px 16px' }}>{t}</span>
-                ))}
-              </div>
-            </div>
+            <h2 style={{ fontFamily: P.poppins, fontWeight: 600, fontSize: 'clamp(28px,4vw,40px)', letterSpacing: '.05em', textTransform: 'uppercase', color: P.cream, margin: '22px 0 0', lineHeight: 1.1 }}>La Pelota No Se Mancha</h2>
+            <p style={{ fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(18px,1.9vw,24px)', lineHeight: 1.4, color: P.cream, margin: '26px 0 0' }}>
+              To mark Mexico's historic third hosting of the FIFA World Cup — <strong style={{ fontWeight: 700 }}>football as a global cultural phenomenon.</strong>
+            </p>
+            <p style={{ fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(15px,1.5vw,20px)', lineHeight: 1.6, color: P.taupe, margin: '24px 0 0', maxWidth: '52ch' }}>
+              FUTBOLITIS joins forces with POD Art House — an international group exhibition bringing together painting, photography, video and installation spanning contemporary and vintage work. 18 artists from Argentina, Mexico, Italy, the United Kingdom, Germany, the Netherlands and France.
+            </p>
+            <button onClick={() => setRsvpTarget({ kind: 'exhibition' })} style={{ marginTop: '30px', fontFamily: P.plex, fontWeight: 400, fontSize: 'clamp(14px,1.3vw,16px)', letterSpacing: '.12em', textTransform: 'uppercase', color: P.cream, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>See more &rarr;</button>
           </div>
-        </section>
-
-        <div style={{ height: '1px', background: T.borderFaint, margin: '0 clamp(22px,5vw,72px)' }} />
-
-        {/* Events filmstrip */}
-        <section id="events" style={{ padding: 'clamp(64px,9vw,140px) clamp(22px,5vw,72px)', position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '24px', flexWrap: 'wrap' as const, marginBottom: 'clamp(34px,4vw,56px)' }}>
-            <div>
-              <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.28em', textTransform: 'uppercase', color: T.sand }}>POD Art House</span>
-              <h2 className="fx" style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(2.6rem,6vw,3.4rem)', lineHeight: 1, color: T.ink, margin: '.28em 0 0' }}>What's On</h2>
-              <p style={{ fontFamily: T.sans, fontSize: '13px', color: T.inkDim, letterSpacing: '.02em' }}>Curated experiences. Limited capacity.</p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span style={{ fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.2em', textTransform: 'uppercase', color: T.inkFaint }}>{EVENTS.length} upcoming</span>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {(['prev', 'next'] as const).map(dir => (
-                  <button key={dir} onClick={() => stripRef.current?.scrollBy({ left: dir === 'prev' ? -320 : 320, behavior: 'smooth' })}
-                    style={{ width: '42px', height: '42px', borderRadius: '50%', border: `1px solid ${T.border}`, background: 'transparent', color: T.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '16px', transition: 'all .25s ease' }}>
-                    {dir === 'prev' ? '←' : '→'}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="exh-image" style={{ width: '100%', aspectRatio: '664 / 464', overflow: 'hidden', background: P.ink2 }}>
+            <img src={heroImage} alt="La Pelota No Se Mancha" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-
-          <div ref={stripRef} className="filmstrip">
-            {EVENTS.map((ev, i) => (
-              <EventCard
-                key={i}
-                ev={ev}
-                idx={i}
-                reserved={isReserved(i)}
-                onRSVP={() => setRsvpTarget({ kind: 'event', refIdx: i })}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer id="contact" style={{ padding: 'clamp(48px,7vw,90px) clamp(22px,5vw,72px) 40px', borderTop: `1px solid ${T.borderFaint}`, position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '30px', flexWrap: 'wrap' as const, alignItems: 'flex-start', marginBottom: '48px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-            <img src={logoUrl} alt="POD Art House" style={{ width: '40px', height: '40px', opacity: .9, color: T.ink }} />
-            <div style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(2rem,5vw,3rem)', lineHeight: 1, color: T.ink }}>POD Art House</div>
-          </div>
-            <div style={{ fontFamily: T.sans, fontSize: '13px', lineHeight: 1.9, color: T.inkDim, textAlign: 'right' as const }}>
-              Av. Nuevo León 108<br />Hipódromo Condesa<br />Ciudad de México<br />
-              <span style={{ color: T.sand }}>@podarthouse</span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, paddingTop: '22px', borderTop: `1px solid ${T.borderFaint}` }}>
-            {['Productivity · Wellness · Art · Community', '© 2026 POD Art House'].map(t => (
-              <span key={t} style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.12em', textTransform: 'uppercase', color: T.inkFaint }}>{t}</span>
-            ))}
-          </div>
-        </footer>
-      </main>
-
-      {/* Sticky bar */}
-      <div className="sticky-bar-el" style={{ position: 'fixed', left: '62px', right: 0, bottom: 0, zIndex: 38, transform: stickyShow ? 'translateY(0)' : 'translateY(110%)', transition: 'transform .5s cubic-bezier(.2,.7,.3,1)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, padding: '15px clamp(22px,5vw,72px)', background: 'rgba(13,13,13,0.9)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${T.sand}` }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px' }}>
-            <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: '1.25rem', color: T.ink }}>{EXHIBITION.title}</span>
-            <span style={{ fontFamily: T.sans, fontSize: '10.5px', letterSpacing: '.14em', textTransform: 'uppercase', color: T.inkFaint }}>FUTBOLITIS × POD — Jun 5 – Jul 29</span>
-          </div>
-          <button onClick={() => document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' })} style={{ display: 'inline-flex', alignItems: 'center', gap: '11px', fontFamily: T.sans, fontWeight: 500, fontSize: '10.5px', letterSpacing: '.16em', textTransform: 'uppercase', padding: '10px 18px', color: T.sand, border: `1px solid ${T.sand}`, borderRadius: '2px', background: 'transparent', cursor: 'pointer' }}>
-            See what's on <span>→</span>
-          </button>
         </div>
-      </div>
+      </section>
 
-      {/* Overlay */}
+      {/* Coming soon (dark) */}
+      <section style={{ background: P.ink, color: P.cream, padding: `clamp(24px,3vw,40px) ${PAD} clamp(56px,8vw,90px)` }}>
+        <h2 style={{ ...sectionHeading, color: P.cream, marginBottom: 'clamp(28px,4vw,50px)' }}>Coming Soon</h2>
+        <div className="soon-grid fx">
+          {COMING_SOON.map((c, i) => (
+            <article key={i}>
+              <div style={{ width: '100%', aspectRatio: '434 / 266', overflow: 'hidden', background: P.ink2 }}>
+                <img src={i === 1 ? dinnerImage : heroImage} alt={c.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ marginTop: '18px', fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(12px,1.1vw,16px)', letterSpacing: '.06em', textTransform: 'uppercase', color: P.taupe }}>{c.type}</div>
+              <div style={{ fontFamily: P.poppins, fontWeight: 600, fontSize: 'clamp(16px,1.7vw,20px)', letterSpacing: '.04em', textTransform: 'uppercase', color: P.cream, margin: '6px 0 8px', lineHeight: 1.2 }}>{c.title}</div>
+              <div style={{ fontFamily: P.poppins, fontWeight: 300, fontSize: 'clamp(14px,1.4vw,20px)', color: P.cream }}>{c.dates}</div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Statement strip */}
+      <section style={{ background: P.cream2, padding: `clamp(48px,6vw,86px) ${PAD}` }}>
+        <p style={{ fontFamily: P.poppins, fontWeight: 400, fontSize: 'clamp(18px,2vw,24px)', lineHeight: 1.5, color: P.ink, margin: '0 auto', maxWidth: '1118px', textAlign: 'center' }}>
+          POD Art House explores art as a way of connecting with the community — bringing together exhibitions, music, food and ideas in the heart of Condesa.
+        </p>
+      </section>
+
+      {/* This week at POD */}
+      <section id="events" style={{ background: P.cream, padding: `clamp(56px,7vw,90px) ${PAD}` }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap' as const, marginBottom: 'clamp(34px,5vw,60px)' }}>
+          <h2 style={{ ...sectionHeading, color: P.ink2 }}>This Week at POD</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontFamily: P.plex, fontSize: 'clamp(14px,1.3vw,20px)', letterSpacing: '.1em', textTransform: 'uppercase', color: P.ink }}>
+            <span style={{ fontWeight: 600 }}>Schedule</span>
+            <span style={{ width: '1px', height: '28px', background: 'rgba(13,13,13,0.3)' }} />
+            <span style={{ fontWeight: 300, color: 'rgba(13,13,13,0.5)' }}>Calendar</span>
+          </div>
+        </div>
+        <div className="fx" style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(20px,2.4vw,28px)' }}>
+          {EVENTS.map((ev, i) => (
+            <EventRow key={i} ev={ev} reserved={isReserved(i)} onRSVP={() => setRsvpTarget({ kind: 'event', refIdx: i })} />
+          ))}
+        </div>
+      </section>
+
+      {/* CTA strip */}
+      <section id="contact" style={{ background: P.cream2, padding: `clamp(40px,5vw,66px) ${PAD}` }}>
+        <p style={{ fontFamily: P.poppins, fontWeight: 400, fontSize: 'clamp(17px,1.9vw,24px)', lineHeight: 1.5, color: P.ink, margin: '0 auto', maxWidth: '1118px', textAlign: 'center' }}>
+          Have an idea for your event? Need a space for your exhibition? <a href="mailto:hola@podcondesa.mx" style={{ color: P.ink, textDecoration: 'underline', textUnderlineOffset: '4px' }}>Get in touch with us.</a>
+        </p>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ background: P.ink, color: P.cream, padding: `clamp(48px,6vw,78px) ${PAD}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '32px', flexWrap: 'wrap' as const }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <img src={logoUrl} alt="POD Condesa" style={{ width: '42px', height: '42px' }} />
+            <span style={{ fontFamily: P.poppins, fontWeight: 600, fontSize: 'clamp(22px,3vw,36px)', letterSpacing: '.18em', textTransform: 'uppercase', color: P.cream }}>POD Condesa</span>
+          </div>
+          <div style={{ textAlign: 'right' as const, color: P.cream, textTransform: 'uppercase' as const }}>
+            <div style={{ fontFamily: P.poppins, fontWeight: 400, fontSize: 'clamp(16px,1.8vw,24px)', letterSpacing: '.05em', lineHeight: 1.3 }}>Av. Nuevo León 108</div>
+            <div style={{ fontFamily: P.poppins, fontWeight: 400, fontSize: 'clamp(12px,1.2vw,16px)', letterSpacing: '.05em', lineHeight: 1.3 }}>Hipódromo Condesa, Ciudad de México</div>
+            <div style={{ fontFamily: P.plex, fontWeight: 300, fontSize: 'clamp(12px,1.2vw,16px)', letterSpacing: '.06em', marginTop: '12px' }}>@pod_condesa</div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Overlay (RSVP + Gallery) */}
       {overlayOpen && (
         <div onClick={(e) => { if (e.target === e.currentTarget) { setRsvpTarget(null); setGalleryOpen(false); } }}
           style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'rgba(8,8,8,0.72)', backdropFilter: 'blur(5px)' }}>
@@ -606,7 +583,7 @@ export default function App() {
       )}
 
       {/* Toast */}
-      <div style={{ position: 'fixed', left: '50%', bottom: '28px', transform: `translateX(-50%) translateY(${toast ? '0' : '24px'})`, zIndex: 120, background: T.ink, color: '#0D0D0D', fontFamily: T.sans, fontWeight: 500, fontSize: '11px', letterSpacing: '.1em', textTransform: 'uppercase', padding: '13px 22px', borderRadius: '40px', opacity: toast ? 1 : 0, transition: 'all .35s cubic-bezier(.2,.8,.3,1)', pointerEvents: 'none' }}>
+      <div style={{ position: 'fixed', left: '50%', bottom: '28px', transform: `translateX(-50%) translateY(${toast ? '0' : '24px'})`, zIndex: 120, background: P.ink, color: P.cream, fontFamily: P.plex, fontWeight: 500, fontSize: '11px', letterSpacing: '.1em', textTransform: 'uppercase', padding: '13px 22px', borderRadius: '40px', opacity: toast ? 1 : 0, transition: 'all .35s cubic-bezier(.2,.8,.3,1)', pointerEvents: 'none' }}>
         {toast}
       </div>
     </div>
